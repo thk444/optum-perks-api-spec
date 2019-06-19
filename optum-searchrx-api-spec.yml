@@ -1,0 +1,640 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: SearchRx REST API
+  contact:
+    name: Livefront
+    url: https://livefront.com
+  description: >-
+    REST API specification for SearchRx
+security:
+  - application:
+      - read
+      - write
+paths:
+  /account:
+    post:
+      summary: Create a new anonymous user account.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+  /cities:
+    post:
+      summary: Search for cities, states, or ZIP Codes (see description).
+      description: Results will match all or part of the query as the user types.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          description: The current user's ID, if any.
+        - in: query
+          name: q
+          schema:
+            type: string
+          required: true
+          description: Query to match all or part of a city, state, or ZIP Code.
+          example: minneap
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Minneapolis, MN
+                    zip:
+                      type: string
+                      example: 55401
+  /coupons:
+    get:
+      summary: Get all the coupons for the specified account ID.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The current user's ID.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/Coupon'
+    post:
+      summary: Create a new coupon for the specified GPI14.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The current user's ID.
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                gpi14:
+                  $ref: '#/components/schemas/GPI14'
+                contact:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - mobileApp
+                        - textMessage
+                    email:
+                      type: string
+                      format: email
+                    phoneNumber:
+                      type: string
+                      example: 612-111-1111
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Coupon'
+  /coupons/{id}:
+    get:
+      summary: Get details for the coupon with the specified ID for the specified account ID.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The current user's ID.
+        - name: 'id'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID for a given coupon.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Coupon'
+  /coupons/{id}/share:
+    post:
+      summary: Share an existing coupon for the specified coupon ID and account ID.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The current user's ID.
+        - name: 'id'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID for a given coupon.
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                shareType:
+                  type: string
+                  enum:
+                    - textMessage
+                    - email
+                    - mobileAppShareSheet
+                email:
+                  type: string
+                  format: email
+                phoneNumber:
+                  type: string
+                  example: 612-111-1111
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  welcomeText:
+                    type: string
+                  pdf:
+                    type: string
+                    example: https://example.com/coupon.pdf
+                  coupon:
+                    $ref: '#/components/schemas/Coupon'
+  /drugs:
+    post:
+      summary: Search for drugs (see description).
+      description: Results will match all or part of the query as the user types.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          description: The current user's ID, if any.
+        - in: query
+          name: q
+          schema:
+            type: string
+          required: true
+          description: Query to match all or part of a drug's generic or brand name.
+          example: Atorvastatin
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Indicates which page of results to load.
+          example: 3
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          required: false
+          description: Indicates how many results to return per page.
+          example: 50
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - common
+              - popular
+          required: false
+          description: >
+            Filters the results based on the specified value.
+              - **common**: Includes the most common drugs. These are configured by hand on the backend specifically for SEO.
+          example: common
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum:
+              - name
+              - popularity
+          required: false
+          description: >
+            Sorts the results based on the specified value.
+              - **name**: Sorts results alphabetically.
+              - **-name**: Sorts results reverse-alphabetically.
+              - **popularity**: Sorts results by popularity. Most popular first.
+              - **-popularity**: Sorts results by popularity. Least popular first.
+          example: common
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Drug'
+  /drugs/{id}:
+    get:
+      summary: Returns the drug with the specified ID.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          description: The current user's ID, if any.
+        - name: 'id'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID for a given drug.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drug'
+  /prices:
+    post:
+      summary: Search for prices (see description).
+      description: Returns prices based on drug, dosage, quantity, and location information. Results only include one result per matching retailer.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          description: The current user's ID, if any.
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PriceListQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Price'
+  /prices/map:
+    post:
+      summary: Search for prices (see description).
+      description: Returns prices based on drug, dosage, quantity, and location information. Results include all locations for matching retailers in the given radius around the specified coordinates.
+      parameters:
+        - in: header
+          name: X-Account-ID
+          schema:
+            type: string
+            format: uuid
+          description: The current user's ID, if any.
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PriceMapQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Price'
+components:
+  schemas:
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Lipitor
+    Coupon:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - mobileApp
+            - textMessage
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+          example: 612-111-1111
+        bin:
+          type: string
+        grp:
+          type: string
+        pcn:
+          type: string
+        uid:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+    Dosage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        value:
+          type: string
+          example: 40
+        unit:
+          type: string
+          example: mg
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quantity'
+        defaultQuantityId:
+          type: string
+          format: uuid
+          description: Will be null if there is no default.
+    DollarValue:
+      type: integer
+      example: 1050
+      description: Dollar value in cents. e.g. 1050 equals $10.50
+    Drug:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ndc:
+          type: string
+          example: 68645046054
+          description: >
+            National Drug Code from the FDA
+            https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+        name:
+          type: string
+          example: Atorvastatin
+        brands:
+          type: array
+          items:
+            $ref: '#/components/schemas/Brand'
+        forms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Form'
+        defaultBrandId:
+          type: string
+          format: uuid
+          description: Will be null if the default is generic.
+        defaultFormId:
+          type: string
+          format: uuid
+          description: Will be null if there is no default.
+    Form:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Tablet
+        dosages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dosage'
+        defaultDosageId:
+          type: string
+          format: uuid
+          description: Will be null if there is no default.
+    GPI14:
+      type: string
+      example: 39400010100330
+      description: >
+        Medispan Generic Product Identifier
+        https://www.wolterskluwercdi.com/drug-data/gpi/
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+    Price:
+      type: object
+      properties:
+        retailer:
+          $ref: '#/components/schemas/Retailer'
+        originalPrice:
+          $ref: '#/components/schemas/DollarValue'
+        price:
+          $ref: '#/components/schemas/DollarValue'
+        priceType:
+          type: array
+          items:
+            type: string
+            enum:
+              - retail
+              - coupon
+              - GoodRxGold
+        fulfillmentType:
+          type: string
+          enum:
+            - retail
+            - mailOrder
+        isLowPrice:
+          type: boolean
+        otherPrices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Price'
+          description: Nested price objects for comparison to this price.
+    PriceListQuery:
+      type: object
+      required:
+        - drugId
+        - dosage
+        - quantity
+        - searchLocation
+      properties:
+        gpi14:
+          $ref: '#/components/schemas/GPI14'
+        brandId:
+          type: string
+          format: uuid
+          description: Required when searching for a brand-name drug.
+        searchLocation:
+          $ref: '#/components/schemas/SearchLocation'
+        currentLocation:
+          $ref: '#/components/schemas/Location'
+          description: Only included if location services are available on the client.
+    PriceMapQuery:
+      type: object
+      required:
+        - drugId
+        - dosage
+        - quantity
+        - searchLocation
+        - radius
+      properties:
+        drugId:
+          type: string
+          format: uuid
+        brandId:
+          type: string
+          format: uuid
+          description: Required when searching for a brand-name drug.
+        dosage:
+          $ref: '#/components/schemas/Dosage'
+        quantity:
+          $ref: '#/components/schemas/Quantity'
+        center:
+          $ref: '#/components/schemas/Location'
+          description: The center of the map.
+        radius:
+          type: number
+          format: double
+          description: The radius in meters of the search area.
+    Quantity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        value:
+          type: string
+          example: 90
+        unit:
+          type: string
+          example: tablets
+        gpi14:
+          $ref: '#/components/schemas/GPI14'
+    Retailer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Target
+        isMembershipRequired:
+          type: boolean
+        membershipDetailsUrl:
+          type: string
+          example: https://rcam.target.com/#/
+        location:
+          $ref: '#/components/schemas/RetailerLocation'
+    RetailerLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        addressLine1:
+          type: string
+          example: 123 Main St.
+        addressLine2:
+          type: string
+        city:
+          type: string
+          example: Minneapolis
+        state:
+          type: string
+          example: MN
+        zipCode:
+          type: string
+          example: 55401
+        hours:
+          type: array
+          items:
+            type: object
+            properties:
+              dayOfTheWeek:
+                type: string
+                example: Sunday
+              opensAt:
+                type: integer
+                example: 8
+                description: Hour of the day in 24-hour time when the store opens.
+              closesAt:
+                type: integer
+                example: 22
+                description: Hour of the day in 24-hour time when the store closes.
+        websiteUrl:
+          type: string
+          example: https://target.com
+        phoneNumber:
+          type: string
+          example: (612) 111-1111
+        coordinates:
+          $ref: '#/components/schemas/Location'
+        rating:
+          type: object
+          properties:
+            title:
+              type: string
+              example: 4.1 out of 5 Stars
+            description:
+              type: string
+              example: From 52 reviews on Yelp
+            url:
+              type: string
+              example: https://www.yelp.com/biz/target-minneapolis-2
+    SearchLocation:
+      type: object
+      description: >
+        May include a ZIP Code OR lat/lng OR both.
+          - **zipCode**: ZIP Code will be included when the user searched for a city.
+          - **currentLocation**: Location will be included when the user has enabled location services on their device.
+          - Both will be included when the user has enabled location services on their device and searches for drugs in a specific location other than their current location.
+      properties:
+        zipCode:
+          type: string
+        currentLocation:
+          $ref: '#/components/schemas/Location'
