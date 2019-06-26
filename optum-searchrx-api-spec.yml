@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0"
+  version: '1.0.0'
   title: SearchRx REST API
   contact:
     name: Livefront
     url: https://livefront.com
-  description: >-
+  description: >
     REST API specification for SearchRx
 security:
   - application:
@@ -14,7 +14,8 @@ security:
 paths:
   /account:
     post:
-      summary: Create a new anonymous user account.
+      description: |
+        Creates a new anonymous user account.
       responses:
         '201':
           description: Created
@@ -24,17 +25,13 @@ paths:
                 $ref: '#/components/schemas/User'
   /cities:
     get:
-      summary: Search for cities, states, or ZIP Codes (see description).
-      description: Results will match all or part of the query as the user types.
+      description: |
+        Returns cities, states, or ZIP Codes that match the query.
+
+        This endpoint is intended to be used to display results in real time as the user types.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - in: query
-          name: q
-          schema:
-            type: string
-          required: true
-          description: Query to match all or part of a city, state, or ZIP Code.
-          example: minneap
+        - $ref: '#/components/parameters/citiesQuery'
       responses:
         '200':
           description: OK
@@ -43,106 +40,11 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: Minneapolis, MN
-                    zip:
-                      type: string
-                      example: 55401
-  /coupons:
-    get:
-      summary: Get all the coupons for the specified account ID.
-      description: When available, clients will specify their current location via the query string. Coupon results should include `nearestLocation` relative to the user's current location.
-      parameters:
-        - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/latitude'
-        - $ref: '#/components/parameters/longitude'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  $ref: '#/components/schemas/Coupon'
-    post:
-      summary: Create a new coupon for the specified GPI14.
-      parameters:
-        - $ref: '#/components/parameters/accountId'
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              type: object
-              properties:
-                gpi14:
-                  $ref: '#/components/schemas/GPI14'
-                contact:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                      enum:
-                        - mobileApp
-                        - textMessage
-                    email:
-                      type: string
-                      format: email
-                    phoneNumber:
-                      type: string
-                      example: 612-111-1111
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                $ref: '#/components/schemas/Coupon'
-  /coupons/{id}:
-    get:
-      summary: Get details for the coupon with the specified ID for the specified account ID.
-      description: When available, clients will specify their current location via the query string. Coupon results should include `nearestLocation` relative to the user's current location.
-      parameters:
-        - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/latitude'
-        - $ref: '#/components/parameters/longitude'
-        - name: 'id'
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID for a given coupon.
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                $ref: '#/components/schemas/Coupon'
-    delete:
-      summary: Delete the coupon with the specified ID for the specified account ID.
-      parameters:
-        - $ref: '#/components/parameters/accountId'
-        - name: 'id'
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID for a given coupon.
-      responses:
-        '204':
-          description: No Content
+                  $ref: '#/components/schemas/City'
   /content:
     get:
-      summary: Get app content.
+      description: |
+        Returns dynamic app content.
       parameters:
         - $ref: '#/components/parameters/accountId'
       responses:
@@ -154,65 +56,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AppContent'
-  /coupons/{id}/share:
-    post:
-      summary: Share an existing coupon for the specified coupon ID and account ID.
-      parameters:
-        - $ref: '#/components/parameters/accountId'
-        - name: 'id'
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID for a given coupon.
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              type: object
-              properties:
-                shareType:
-                  type: string
-                  enum:
-                    - textMessage
-                    - email
-                    - mobileAppShareSheet
-                email:
-                  type: string
-                  format: email
-                phoneNumber:
-                  type: string
-                  example: 612-111-1111
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  defaultShareText:
-                    type: string
-                    example: >
-                      Atorvastatin Card:
-                      MemberID: ABC1234567
-                      RxGroup: ABC123
-                      RxBin: 009999
-                      RxPCN: ABCDEF
-                      Pharmacist: 1-888-111-1111
-                      Questions: 1-888-111-1111
-                      https://searchrx.com/123
-                  defaultShareImageUrl:
-                    type: string
-                    example: https://example.com/coupon.png
-                  coupon:
-                    $ref: '#/components/schemas/Coupon'
-  /devices:
+  /coupons:
     get:
-      summary: Get all the devices for the specified account ID.
+      description: |
+        Returns all of the coupons for the specified account ID.
+
+        When available, clients should specify their current location via the `latitude` and `longitude` query parameters. Results should include `nearestLocation` relative to the specified location.
       parameters:
         - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/longitude'
       responses:
         '200':
           description: OK
@@ -221,39 +74,83 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Device'
+                  $ref: '#/components/schemas/Coupon'
     post:
-      summary: Create a new device for the current user with the specified properties.
+      description: |
+        Creates a new coupon for the specified GPI14.
       parameters:
         - $ref: '#/components/parameters/accountId'
       requestBody:
         content:
           'application/json':
             schema:
-              type: object
-              properties:
-                deviceToken:
-                  type: string
-                  format: uuid
-                  description: Push notification token provided by iOS or Android.
-                deviceIdentifier:
-                  type: string
-                  format: uuid
-                  description: Persistent, unique identifier for this device generated by the client.
-                platform:
-                  type: string
-                  enum:
-                    - iOS
-                    - Android
-                model:
-                  type: string
-                  example: iPhone X
-                osVersion:
-                  type: string
-                  example: iOS 12.2
-                appVersion:
-                  type: string
-                  example: 1.4
+              $ref: '#/components/schemas/CouponPost'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Coupon'
+  /coupons/{id}:
+    get:
+      description: |
+        Returns details for the coupon with the specified ID for the specified account ID.
+
+        When available, clients should specify their current location via the `latitude` and `longitude` query parameters. Results should include `nearestLocation` relative to the specified location.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/couponId'
+        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/longitude'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Coupon'
+    delete:
+      description: |
+        Deletes the coupon with the specified ID for the specified account ID.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/couponId'
+      responses:
+        '204':
+          description: No Content
+  /coupons/{id}/share:
+    post:
+      description: |
+        Shares an existing coupon for the specified coupon ID and account ID.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/couponId'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CouponSharePost'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouponShare'
+  /devices:
+    post:
+      description: |
+        Creates a new device for the current user with the specified properties.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/DevicePost'
       responses:
         '201':
           description: Created
@@ -263,16 +160,13 @@ paths:
                 $ref: '#/components/schemas/Device'
   /drugs:
     get:
-      summary: Search for drugs (see description).
-      description: Results will match all or part of the query as the user types.
+      description: |
+        Returns a list of drugs that match the query parameters.
+
+        This endpoint is intended to be used to display results in real time as the user types.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - in: query
-          name: q
-          schema:
-            type: string
-          description: Query to match all or part of a drug's generic or brand name.
-          example: Atorvastatin
+        - $ref: '#/components/parameters/drugsQuery'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
         - in: query
@@ -283,9 +177,10 @@ paths:
               - common
               - popular
           required: false
-          description: >
+          description: |
             Filters the results based on the specified value.
-              - **common**: Includes the most common drugs. These are configured by hand on the backend specifically for SEO.
+              - `common`: Includes the most common drugs. These are configured by hand on the backend specifically for SEO.
+              - `popular`: Includes the most popular drugs.
           example: common
         - in: query
           name: sort
@@ -293,14 +188,16 @@ paths:
             type: string
             enum:
               - name
+              - -name
               - popularity
+              - -popularity
           required: false
-          description: >
+          description: |
             Sorts the results based on the specified value.
-              - **name**: Sorts results alphabetically.
-              - **-name**: Sorts results reverse-alphabetically.
-              - **popularity**: Sorts results by popularity. Most popular first.
-              - **-popularity**: Sorts results by popularity. Least popular first.
+              - `name`: Sorts results alphabetically.
+              - `-name`: Sorts results reverse-alphabetically.
+              - `popularity`: Sorts results by popularity. Most popular first.
+              - `-popularity`: Sorts results by popularity. Least popular first.
           example: common
       responses:
         '200':
@@ -313,16 +210,11 @@ paths:
                   $ref: '#/components/schemas/Drug'
   /drugs/{id}:
     get:
-      summary: Returns the drug with the specified ID.
+      description: |
+        Returns the drug with the specified ID.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - name: 'id'
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID for a given drug.
+        - $ref: '#/components/parameters/drugId'
       responses:
         '200':
           description: OK
@@ -332,16 +224,11 @@ paths:
                 $ref: '#/components/schemas/Drug'
   /drugs/{id}/images:
     get:
-      summary: Returns images for the drug with the specified ID.
+      description: |
+        Returns images for the drug with the specified ID.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - name: 'id'
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID for a given drug.
+        - $ref: '#/components/parameters/drugId'
       responses:
         '200':
           description: OK
@@ -353,7 +240,8 @@ paths:
                   $ref: '#/components/schemas/Image'
   /killswitch:
     get:
-      summary: Check to see if a given client is still supported.
+      description: |
+        Check to see if a given client is still supported.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - name: platform
@@ -363,47 +251,36 @@ paths:
             enum:
               - iOS
               - Android
+          required: true
         - name: model
           in: query
           schema:
             type: string
           example: iPhone X
+          required: true
         - name: osVersion
           in: query
           schema:
             type: string
           example: iOS 12.2
+          required: true
         - name: appVersion
           in: query
           schema:
             type: string
           example: 1.4
+          required: true
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  isSupported:
-                    type: boolean
-                  error:
-                    type: object
-                    properties:
-                      title:
-                        type: string
-                        example: New Version Available
-                      message:
-                        type: string
-                        example: This version is no longer supported. Please updated to the latest version.
-                  url:
-                    type: string
-                    example: https://example.com/new-version-info.html
-                    description: The user can open this URL to review upgrade details or install the latest version of the app.
+                $ref: '#/components/schemas/Killswitch'
   /preferences:
     get:
-      summary: Get the current user's preferences.
+      description: |
+        Returns the current user's preferences.
       parameters:
         - $ref: '#/components/parameters/accountId'
       responses:
@@ -414,7 +291,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Preferences'
     patch:
-      summary: Update the current user's preferences.
+      description: |
+        Updates the current user's preferences.
       parameters:
         - $ref: '#/components/parameters/accountId'
       requestBody:
@@ -431,8 +309,17 @@ paths:
                 $ref: '#/components/schemas/Preferences'
   /prices:
     get:
-      summary: Search for prices (see description).
-      description: Returns prices based on drug, dosage, quantity, and location information. Results only include one result per matching retailer.
+      description: |
+        Returns prices based on the specified GPI14 that encodes brand, form, dosage, and quantity.
+
+        When `radius` is specified:
+          - `center[latitude]` and `center[longitude]` are required.
+          - Results will be displayed on an interactive map.
+          - All matching locations in the search area are are returned.
+
+        When `radius` is omitted:
+          - `center[latitude]` and `center[longitude]` are ignored.
+          - Only one result per matching retailer is returned for the nearest location to `searchLocation` for that retailer.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/gpi14'
@@ -442,51 +329,9 @@ paths:
         - $ref: '#/components/parameters/searchLocationLongitude'
         - $ref: '#/components/parameters/longitude'
         - $ref: '#/components/parameters/latitude'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Price'
-  /prices/map:
-    get:
-      summary: Search for prices (see description).
-      description: Returns prices based on drug, dosage, quantity, and location information. Results include all locations for matching retailers in the given radius around the specified coordinates.
-      parameters:
-        - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/gpi14'
-        - name: center[latitude]
-          in: query
-          schema:
-            type: number
-            format: double
-          description: The latitude of the center point of the search area.
-          example: 44.949782
-          required: true
-        - name: center[longitude]
-          in: query
-          schema:
-            type: number
-            format: double
-          description: The longitude of the center point of the search area.
-          example: -93.285233
-          required: true
-        - name: radius
-          in: query
-          schema:
-            type: number
-            format: double
-          description: The radius in meters of the search area.
-          required: true
-        - $ref: '#/components/parameters/searchLocationType'
-        - $ref: '#/components/parameters/searchLocationZipCode'
-        - $ref: '#/components/parameters/searchLocationLatitude'
-        - $ref: '#/components/parameters/searchLocationLongitude'
-        - $ref: '#/components/parameters/longitude'
-        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/radius'
+        - $ref: '#/components/parameters/centerLatitude'
+        - $ref: '#/components/parameters/centerLongitude'
       responses:
         '200':
           description: OK
@@ -498,7 +343,8 @@ paths:
                   $ref: '#/components/schemas/Price'
   /retailers:
     get:
-      summary: List retailers.
+      description: |
+        Returns retailers sorted alphabetically.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/page'
@@ -514,18 +360,31 @@ paths:
                   $ref: '#/components/schemas/Retailer'
   /retailers/{id}/locations:
     get:
-      summary: Get nearby retailer locations based on the specified search criteria.
+      description: |
+        Returns retailer locations that match the specified search criteria.
+
+        Results are in order by distance from the search location.
+
+        When `radius` is specified:
+          - `center[latitude]` and `center[longitude]` are required.
+          - `page` and `limit` are ignored.
+          - Results will be displayed on an interactive map.
+          - All matching locations in the search area are are returned.
+
+        When `radius` is omitted:
+          - `center[latitude]` and `center[longitude]` are ignored.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - name: 'id'
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The ID for a given retailer.
-        - $ref: '#/components/parameters/longitude'
-        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/retailerId'
+        - $ref: '#/components/parameters/searchLocationRequiredType'
+        - $ref: '#/components/parameters/searchLocationZipCode'
+        - $ref: '#/components/parameters/searchLocationLatitude'
+        - $ref: '#/components/parameters/searchLocationLongitude'
+        - $ref: '#/components/parameters/radius'
+        - $ref: '#/components/parameters/centerLatitude'
+        - $ref: '#/components/parameters/centerLongitude'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
       responses:
         '200':
           description: OK
@@ -544,6 +403,53 @@ components:
         type: string
         format: uuid
       description: The current user's ID, if any.
+    centerLatitude:
+      in: query
+      name: center[latitude]
+      schema:
+        type: number
+        format: double
+      description: The latitude of the center point of the search area. Required if `radius` is specified.
+      example: 44.949782
+    centerLongitude:
+      in: query
+      name: center[longitude]
+      schema:
+        type: number
+        format: double
+      description: The longitude of the center point of the search area. Required if `radius` is specified.
+      example: -93.285233
+    citiesQuery:
+      in: query
+      name: q
+      schema:
+        type: string
+      required: true
+      description: Query to match all or part of a city, state, or ZIP Code.
+      example: minneap
+    couponId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID for a given coupon.
+    drugId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID for a given drug.
+    drugsQuery:
+      in: query
+      name: q
+      schema:
+        type: string
+      description: Query to match all or part of a drug's generic or brand name.
+      example: Atorvastatin
     gpi14:
       in: query
       name: gpi14
@@ -584,25 +490,41 @@ components:
         type: integer
       description: Indicates which page of results to load.
       example: 3
-    searchLocationLatitude:
-      name: searchLocation[latitude]
+    radius:
       in: query
+      name: radius
+      schema:
+        type: number
+        format: double
+      description: The radius in meters of the search area.
+      example: 100
+    retailerId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID for a given retailer.
+    searchLocationLatitude:
+      in: query
+      name: searchLocation[latitude]
       schema:
         type: number
         format: double
       description: The user's current location latitude required when `searchLocation` type is `currentLocation`.
       example: 44.949782
     searchLocationLongitude:
-      name: searchLocation[longitude]
       in: query
+      name: searchLocation[longitude]
       schema:
         type: number
         format: double
       description: The user's current location longitude required when `searchLocation` type is `currentLocation`.
       example: -93.285233
     searchLocationType:
-      name: searchLocation[type]
       in: query
+      name: searchLocation[type]
       schema:
         type: string
         enum:
@@ -610,14 +532,27 @@ components:
           - zipCode
           - currentLocation
       required: true
-      description: >
+      description: |
         May be none, a ZIP Code, or lat/lng.
-        - **none**: No location information will be provided.
-        - **zipCode**: ZIP Code will be included when the user searched for a city.
-        - **currentLocation**: Latitude and longitude will be included when the user has enabled location services on their device.
-    searchLocationZipCode:
-      name: searchLocation[zipCode]
+          - `none`: No location information will be provided.
+          - `zipCode`: ZIP Code will be included when the user searched for a city.
+          - `currentLocation`: Latitude and longitude will be included when the user has enabled location services on their device.
+    searchLocationRequiredType:
       in: query
+      name: searchLocation[type]
+      schema:
+        type: string
+        enum:
+          - zipCode
+          - currentLocation
+      required: true
+      description: |
+        May be a ZIP Code, or lat/lng.
+          - `zipCode`: ZIP Code will be included when the user searched for a city.
+          - `currentLocation`: Latitude and longitude will be included when the user has enabled location services on their device.
+    searchLocationZipCode:
+      in: query
+      name: searchLocation[zipCode]
       schema:
         type: string
       description: The ZIP Code required when `searchLocation` type is `zipCode`.
@@ -648,6 +583,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Form'
+    City:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Minneapolis, MN
+        zip:
+          type: string
+          example: 55401
     Content:
       type: object
       properties:
@@ -693,12 +637,90 @@ components:
           $ref: '#/components/schemas/Price'
         nearestLocation:
           $ref: '#/components/schemas/RetailerLocation'
+    CouponPost:
+      type: object
+      properties:
+        gpi14:
+          $ref: '#/components/schemas/GPI14'
+        contact:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - mobileApp
+                - textMessage
+            email:
+              type: string
+              format: email
+            phoneNumber:
+              type: string
+              example: 612-111-1111
+    CouponShare:
+      type: object
+      properties:
+        defaultShareText:
+          type: string
+          example: >
+            Atorvastatin Card:
+            MemberID: ABC1234567
+            RxGroup: ABC123
+            RxBin: 009999
+            RxPCN: ABCDEF
+            Pharmacist: 1-888-111-1111
+            Questions: 1-888-111-1111
+            https://searchrx.com/123
+        defaultShareImageUrl:
+          type: string
+          example: https://example.com/coupon.png
+        coupon:
+          $ref: '#/components/schemas/Coupon'
+    CouponSharePost:
+      type: object
+      properties:
+        shareType:
+          type: string
+          enum:
+            - textMessage
+            - email
+            - mobileAppShareSheet
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+          example: 612-111-1111
     Device:
       type: object
       properties:
         id:
           type: string
           format: uuid
+        deviceToken:
+          type: string
+          format: uuid
+          description: Push notification token provided by iOS or Android.
+        deviceIdentifier:
+          type: string
+          format: uuid
+          description: Persistent, unique identifier for this device generated by the client.
+        platform:
+          type: string
+          enum:
+            - iOS
+            - Android
+        model:
+          type: string
+          example: iPhone X
+        osVersion:
+          type: string
+          example: iOS 12.2
+        appVersion:
+          type: string
+          example: 1.4
+    DevicePost:
+      type: object
+      properties:
         deviceToken:
           type: string
           format: uuid
@@ -770,6 +792,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Content'
+    FavoriteLocationPreference:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        retailer:
+          $ref: '#/components/schemas/Retailer'
     Form:
       type: object
       properties:
@@ -814,15 +844,35 @@ components:
         manufacturer:
           type: string
           example: Teva Pharmaceuticals USA
+    Killswitch:
+      type: object
+      properties:
+        isSupported:
+          type: boolean
+        error:
+          type: object
+          properties:
+            title:
+              type: string
+              example: New Version Available
+            message:
+              type: string
+              example: This version is no longer supported. Please updated to the latest version.
+        url:
+          type: string
+          example: https://example.com/new-version-info.html
+          description: The user can open this URL to review upgrade details or install the latest version of the app.
     Location:
       type: object
       properties:
         latitude:
           type: number
           format: double
+          example: 44.949782
         longitude:
           type: number
           format: double
+          example: -93.285233
     NDC:
       type: string
       example: 68645046054
@@ -845,6 +895,10 @@ components:
     Preferences:
       type: object
       properties:
+        favoriteLocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FavoriteLocationPreference'
         notifications:
           type: array
           items:
@@ -852,6 +906,15 @@ components:
     PreferencesPatch:
       type: object
       properties:
+        favoriteLocations:
+          type: array
+          items:
+            type: object
+            properties:
+              locationId:
+                type: string
+                format: uuid
+          description: These values will overwrite the existing list of favorite locations.
         notifications:
           type: array
           items:
@@ -892,10 +955,6 @@ components:
             - mailOrder
         isLowestPrice:
           type: boolean
-        distanceFromSearchLocation:
-          type: number
-          format: double
-          description: The distance in meters to this location.
         otherPrices:
           type: array
           items:
@@ -928,6 +987,9 @@ components:
           example: Target
         isPopular:
           type: boolean
+        isFavorite:
+          type: boolean
+          description: Indicates whether or not this retailer has a location in the current user's favorites.
         isMembershipRequired:
           type: boolean
         membershipDetailsUrl:
@@ -944,6 +1006,9 @@ components:
         id:
           type: string
           format: uuid
+        isFavorite:
+          type: boolean
+          description: Indicates whether or not this location is included in the current user's favorites.
         addressLine1:
           type: string
           example: 123 Main St.
@@ -994,6 +1059,10 @@ components:
             url:
               type: string
               example: https://www.yelp.com/biz/target-minneapolis-2
+        distanceFromSearchLocation:
+          type: number
+          format: double
+          description: The distance in meters to this location from the search location.
     User:
       type: object
       properties:
