@@ -29,6 +29,8 @@ paths:
         Returns cities, states, or ZIP Codes that match the query.
 
         This endpoint is intended to be used to display results in real time as the user types.
+
+        When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/citiesQuery'
@@ -62,6 +64,8 @@ paths:
         Returns all of the coupons for the specified account ID.
 
         When available, clients should specify their current location via the `latitude` and `longitude` query parameters. Results should include `nearestLocation` relative to the specified location.
+
+        When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/latitude'
@@ -91,8 +95,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
                 $ref: '#/components/schemas/Coupon'
+        '422':
+          $ref: '#/components/responses/Error422'
   /coupons/{id}:
     get:
       description: |
@@ -110,8 +115,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
                 $ref: '#/components/schemas/Coupon'
+        '404':
+          $ref: '#/components/responses/Error404'
     delete:
       description: |
         Deletes the coupon with the specified ID for the specified account ID.
@@ -121,6 +127,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '404':
+          $ref: '#/components/responses/Error404'
   /coupons/{id}/share:
     post:
       description: |
@@ -140,6 +148,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponShare'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
   /devices:
     post:
       description: |
@@ -158,6 +170,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+        '422':
+          $ref: '#/components/responses/Error422'
   /drugs:
     get:
       description: |
@@ -222,10 +236,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Drug'
+        '404':
+          $ref: '#/components/responses/Error404'
   /drugs/{id}/images:
     get:
       description: |
         Returns images for the drug with the specified ID.
+
+        When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/drugId'
@@ -238,6 +256,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Image'
+        '404':
+          $ref: '#/components/responses/Error404'
   /killswitch:
     get:
       description: |
@@ -307,6 +327,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Preferences'
+        '422':
+          $ref: '#/components/responses/Error422'
   /prices:
     get:
       description: |
@@ -320,6 +342,8 @@ paths:
         When `radius` is omitted:
           - `center[latitude]` and `center[longitude]` are ignored.
           - Only one result per matching retailer is returned for the nearest location to `searchLocation` for that retailer.
+
+        When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/gpi14'
@@ -373,6 +397,8 @@ paths:
 
         When `radius` is omitted:
           - `center[latitude]` and `center[longitude]` are ignored.
+
+        When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/retailerId'
@@ -394,6 +420,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RetailerLocation'
+        '404':
+          $ref: '#/components/responses/Error404'
 components:
   parameters:
     accountId:
@@ -792,6 +820,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Content'
+    Error404:
+      type: object
+      properties:
+        message:
+          type: string
+          example: The resource {resource name} could not be found.
+    Error422:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              fieldName:
+                type: string
+                example: '{fieldName}'
+              message:
+                type: string
+                example: The {fieldName} field cannot be blank.
     FavoriteLocationPreference:
       type: object
       properties:
@@ -1069,3 +1117,21 @@ components:
         id:
           type: string
           format: uuid
+          description: A unique identifier for the user. This value should be sent as the `X-Account-ID` header value for subsequent requests.
+  responses:
+    Error404:
+      description: |
+        Returned when:
+          - The resource with the specified ID can't be found.
+          - The current user does not have access to the resource with this ID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error404'
+    Error422:
+      description: |
+        Returned when request fails due to a validation error–usually a missing a required field.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error422'
