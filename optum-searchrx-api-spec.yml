@@ -611,6 +611,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Form'
+        defaultFormId:
+          type: string
+          format: uuid
+          description: Will be null if there is no default.
     City:
       type: object
       properties:
@@ -642,17 +646,6 @@ components:
         id:
           type: string
           format: uuid
-        type:
-          type: string
-          enum:
-            - mobileApp
-            - textMessage
-        email:
-          type: string
-          format: email
-        phoneNumber:
-          type: string
-          example: 612-111-1111
         bin:
           type: string
         grp:
@@ -670,20 +663,6 @@ components:
       properties:
         gpi14:
           $ref: '#/components/schemas/GPI14'
-        contact:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - mobileApp
-                - textMessage
-            email:
-              type: string
-              format: email
-            phoneNumber:
-              type: string
-              example: 612-111-1111
     CouponShare:
       type: object
       properties:
@@ -812,10 +791,6 @@ components:
           type: string
           format: uuid
           description: Will be null if the default is generic.
-        defaultFormId:
-          type: string
-          format: uuid
-          description: Will be null if there is no default.
         info:
           type: array
           items:
