@@ -40,9 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/City'
+                $ref: '#/components/schemas/CitiesWrapper'
   /content:
     get:
       description: |
@@ -55,9 +53,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AppContent'
+                $ref: '#/components/schemas/AppContentWrapper'
   /coupons:
     get:
       description: |
@@ -76,9 +72,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Coupon'
+                $ref: '#/components/schemas/CouponsWrapper'
     post:
       description: |
         Creates a new coupon for the specified GPI14.
@@ -183,45 +177,15 @@ paths:
         - $ref: '#/components/parameters/drugsQuery'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
-        - in: query
-          name: filter
-          schema:
-            type: string
-            enum:
-              - common
-              - popular
-          required: false
-          description: |
-            Filters the results based on the specified value.
-              - `common`: Includes the most common drugs. These are configured by hand on the backend specifically for SEO.
-              - `popular`: Includes the most popular drugs.
-          example: common
-        - in: query
-          name: sort
-          schema:
-            type: string
-            enum:
-              - name
-              - -name
-              - popularity
-              - -popularity
-          required: false
-          description: |
-            Sorts the results based on the specified value.
-              - `name`: Sorts results alphabetically.
-              - `-name`: Sorts results reverse-alphabetically.
-              - `popularity`: Sorts results by popularity. Most popular first.
-              - `-popularity`: Sorts results by popularity. Least popular first.
-          example: common
+        - $ref: '#/components/parameters/drugsFilter'
+        - $ref: '#/components/parameters/drugsSort'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Drug'
+                $ref: '#/components/schemas/DrugsWrapper'
   /drugs/{id}:
     get:
       description: |
@@ -253,12 +217,105 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Image'
+                $ref: '#/components/schemas/ImagesWrapper'
         '404':
           $ref: '#/components/responses/Error404'
-  /killswitch:
+  /drug-classes:
+    get:
+      description: |
+        Returns all the drug classes.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrugClassesWrapper'
+  /drug-classes/{id}:
+    get:
+      description: |
+        Returns the drug class with the specified ID.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/drugClassId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrugClass'
+        '404':
+          $ref: '#/components/responses/Error404'
+  /drug-classes/{id}/drugs:
+    get:
+      description: |
+        Returns drugs associated with the specified drug class.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/drugClassId'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/drugsSort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrugsWrapper'
+        '404':
+          $ref: '#/components/responses/Error404'
+  /health-conditions:
+    get:
+      description: |
+        Returns all the health conditions.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/healthConditionsFilter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthConditionsWrapper'
+  /health-conditions/{id}:
+    get:
+      description: |
+        Returns the health condition with the specified ID.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/healthConditionId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCondition'
+        '404':
+          $ref: '#/components/responses/Error404'
+  /health-conditions/{id}/drugs:
+    get:
+      description: |
+        Returns drugs associated with the specified health condition.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/healthConditionId'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/drugsSort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrugsWrapper'
+        '404':
+          $ref: '#/components/responses/Error404'
+  /kill-switch:
     get:
       description: |
         Check to see if a given client is still supported.
@@ -288,7 +345,7 @@ paths:
           in: query
           schema:
             type: string
-          example: 1.4
+          example: '1.4'
           required: true
       responses:
         '200':
@@ -296,7 +353,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Killswitch'
+                $ref: '#/components/schemas/KillSwitch'
   /preferences:
     get:
       description: |
@@ -362,9 +419,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Price'
+                $ref: '#/components/schemas/PricesWrapper'
   /retailers:
     get:
       description: |
@@ -379,9 +434,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Retailer'
+                $ref: '#/components/schemas/RetailersWrapper'
   /retailers/{id}/locations:
     get:
       description: |
@@ -417,9 +470,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RetailerLocation'
+                $ref: '#/components/schemas/RetailerLocationsWrapper'
         '404':
           $ref: '#/components/responses/Error404'
 components:
@@ -463,6 +514,14 @@ components:
         type: string
         format: uuid
       description: The ID for a given coupon.
+    drugClassId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID for a drug class.
     drugId:
       in: path
       name: id
@@ -471,6 +530,20 @@ components:
         type: string
         format: uuid
       description: The ID for a given drug.
+    drugsFilter:
+      in: query
+      name: filter
+      schema:
+        type: string
+        enum:
+          - common
+          - popular
+      required: false
+      description: |
+        Filters the results based on the specified value.
+          - `common`: Includes the most common drugs. These are configured by hand on the backend specifically for SEO.
+          - `popular`: Includes the most popular drugs.
+      example: common
     drugsQuery:
       in: query
       name: q
@@ -478,16 +551,54 @@ components:
         type: string
       description: Query to match all or part of a drug's generic or brand name.
       example: Atorvastatin
+    drugsSort:
+      in: query
+      name: sort
+      schema:
+        type: string
+        enum:
+          - name
+          - -name
+          - popularity
+          - -popularity
+      required: false
+      description: |
+        Sorts the results based on the specified value.
+          - `name`: Sorts results alphabetically.
+          - `-name`: Sorts results reverse-alphabetically.
+          - `popularity`: Sorts results by popularity. Most popular first.
+          - `-popularity`: Sorts results by popularity. Least popular first.
+      example: name
     gpi14:
       in: query
       name: gpi14
       schema:
         type: string
-        example: 39400010100330
+        example: '39400010100330'
       required: true
       description: >
         Medispan Generic Product Identifier
         https://www.wolterskluwercdi.com/drug-data/gpi/
+    healthConditionId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID for a health condition.
+    healthConditionsFilter:
+      in: query
+      name: filter
+      schema:
+        type: string
+        enum:
+          - common
+      required: false
+      description: |
+        Filters the results based on the specified value.
+          - `common`: Includes the most common health conditions. These are configured by hand on the backend specifically for SEO.
+      example: common
     latitude:
       in: query
       name: latitude
@@ -598,6 +709,15 @@ components:
           type: string
           example: >
             <p>This is the content for the Help section.</p>
+    AppContentWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppContent'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     Brand:
       type: object
       properties:
@@ -615,6 +735,15 @@ components:
           type: string
           format: uuid
           description: Will be null if there is no default.
+    CitiesWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/City'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     City:
       type: object
       properties:
@@ -623,7 +752,7 @@ components:
           example: Minneapolis, MN
         zip:
           type: string
-          example: 55401
+          example: '55401'
     Content:
       type: object
       properties:
@@ -648,21 +777,37 @@ components:
           format: uuid
         bin:
           type: string
+          example: '009999'
         grp:
           type: string
+          example: ABC123
         pcn:
           type: string
+          example: ABCDEF
         uid:
           type: string
+          example: ABC1234567
         price:
           $ref: '#/components/schemas/Price'
         nearestLocation:
           $ref: '#/components/schemas/RetailerLocation'
+    CouponsWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coupon'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     CouponPost:
       type: object
       properties:
         gpi14:
           $ref: '#/components/schemas/GPI14'
+        locationId:
+          type: string
+          format: uuid
     CouponShare:
       type: object
       properties:
@@ -696,7 +841,7 @@ components:
           format: email
         phoneNumber:
           type: string
-          example: 612-111-1111
+          example: '612-111-1111'
     Device:
       type: object
       properties:
@@ -724,7 +869,7 @@ components:
           example: iOS 12.2
         appVersion:
           type: string
-          example: 1.4
+          example: '1.4'
     DevicePost:
       type: object
       properties:
@@ -749,7 +894,7 @@ components:
           example: iOS 12.2
         appVersion:
           type: string
-          example: 1.4
+          example: '1.4'
     Dosage:
       type: object
       properties:
@@ -757,7 +902,7 @@ components:
           type: string
           format: uuid
         value:
-          type: string
+          type: integer
           example: 40
         unit:
           type: string
@@ -791,10 +936,103 @@ components:
           type: string
           format: uuid
           description: Will be null if the default is generic.
+        forms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Form'
+        defaultFormId:
+          type: string
+          format: uuid
+          description: Will be null if there is no default.
         info:
           type: array
           items:
             $ref: '#/components/schemas/Content'
+        commonBrandNames:
+          type: string
+          example: Lipitor
+        theraputicClassifications:
+          type: string
+          example: Antihyperlipidemic
+        pharmacologicClassifications:
+          type: string
+          example: HMG-COA Reductase Inhibitor
+        urlSlug:
+          type: string
+          example: atorvastatin
+        medicare:
+          type: object
+          properties:
+            isCovered:
+              type: boolean
+            explanation:
+              type: string
+              example: 100% of Medicare Part D and Medicare Advantage plans cover this drug.
+        sideEffects:
+          type: object
+          properties:
+            overview:
+              type: string
+              example: This is not a complete list of side effects and others may occur. Call your doctor for medical advice about side effects.
+            commonSideEffectsOverview:
+              type: string
+              example: Aliquam in scelerisque neque, vitae dignissim eros. In non luctus augue, sed pellentesque risus. Etiam pellentesque rutrum elit, eu lobortis turpis efficitur ullamcorper.
+            commonSideEffects:
+              type: array
+              items:
+                type: string
+                example: dizziness
+            rareSideEffectsOverview:
+              type: string
+              example: Aliquam in scelerisque neque, vitae dignissim eros. In non luctus augue, sed pellentesque risus. Etiam pellentesque rutrum elit, eu lobortis turpis efficitur ullamcorper.
+            rareSideEffects:
+              type: array
+              items:
+                type: string
+                example: dizziness
+    DrugClass:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: ACE Inhibitors
+        description:
+          type: string
+          example: An angiotensin-converting-enzyme inhibitor (ACE inhibitor) is a pharmaceutical drug used primarily for the treatment of hypertension (elevated blood pressure) and congestive heart failure.
+        html:
+          type: string
+          example: >
+            <p>This group of drugs causes relaxation of blood vessels as well as a decrease in blood volume, which leads to lower blood pressure and decreased oxygen demand from the heart. They inhibit the angiotensin-converting enzyme, an important component of the renin–angiotensin system.
+
+            Frequently prescribed ACE inhibitors include benazepril, zofenopril, perindopril, trandolapril, captopril, enalapril, lisinopril, and ramipril.</p>
+        urlSlug:
+          type: string
+          example: ace-inhibitors
+        healthConditions:
+          items:
+            $ref: '#/components/schemas/DrugClassHealthCondition'
+          description: Indicates which health conditions this class of drug is popularly prescribed for.
+    DrugClassesWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugClass'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
+    DrugsWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Drug'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     Error404:
       type: object
       properties:
@@ -842,10 +1080,52 @@ components:
           description: Will be null if there is no default.
     GPI14:
       type: string
-      example: 39400010100330
+      example: '39400010100330'
       description: >
         Medispan Generic Product Identifier
         https://www.wolterskluwercdi.com/drug-data/gpi/
+    HealthCondition:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: The clinical name for this condition.
+          example: Allergic Rhinitis
+        commonName:
+          type: string
+          description: Commonly known as.
+          example: Allergies
+        description:
+          type: string
+          example: This is a brief description of the health condition.
+        html:
+          type: string
+          example: >
+            <p>A damaging immune response by the body to a substance, especially pollen, fur, a particular food, or dust, to which it has become hypersensitive.</p>
+        heroImageUrl:
+          type: string
+          example: https://example.com/image.png
+        heroIconUrl:
+          type: string
+          example: https://example.com/image.png
+        isCommon:
+          type: boolean
+          description: Indicates whether or not this is a common health condition.
+        urlSlug:
+          type: string
+          example: allergies
+    HealthConditionsWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthCondition'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     Image:
       type: object
       properties:
@@ -867,11 +1147,21 @@ components:
         manufacturer:
           type: string
           example: Teva Pharmaceuticals USA
-    Killswitch:
+    ImagesWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
+    KillSwitch:
       type: object
       properties:
         isSupported:
           type: boolean
+          example: false
         error:
           type: object
           properties:
@@ -898,7 +1188,7 @@ components:
           example: -93.285233
     NDC:
       type: string
-      example: 68645046054
+      example: '68645046054'
       description: >
         National Drug Code from the FDA
         https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
@@ -915,6 +1205,25 @@ components:
             - drugNews
         enabled:
           type: boolean
+    PageMetadata:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 1
+          description: The number of results in this payload.
+        currentPage:
+          type: integer
+          example: 1
+          description: The current page index.
+        totalCount:
+          type: integer
+          example: 1
+          description: The total number of results available.
+        totalPages:
+          type: integer
+          example: 1
+          description: The total number of pages available.
     Preferences:
       type: object
       properties:
@@ -948,6 +1257,24 @@ components:
                 format: uuid
               enabled:
                 type: boolean
+    DrugClassHealthCondition:
+      type: object
+      properties:
+        healthCondition:
+          $ref: '#/components/schemas/HealthCondition'
+        popularity:
+          type: string
+          example: '35%'
+          description: This value is displayed to the user to indicate popularity.
+    DrugHealthCondition:
+      type: object
+      properties:
+        healthCondition:
+          $ref: '#/components/schemas/HealthCondition'
+        popularity:
+          type: string
+          example: 'Most Popular'
+          description: This value is displayed to the user to indicate popularity.
     Price:
       type: object
       properties:
@@ -963,14 +1290,16 @@ components:
             - low
             - medium
             - high
-        priceType:
+        priceTypes:
           type: array
           items:
             type: string
             enum:
               - retail
               - coupon
-              - GoodRxGold
+              - searchRx
+            description: |
+              `searchRx` is a placeholder for a future price classification specific to this app.
         fulfillmentType:
           type: string
           enum:
@@ -983,6 +1312,15 @@ components:
           items:
             $ref: '#/components/schemas/Price'
           description: Nested price objects for comparison to this price.
+    PricesWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Price'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     Quantity:
       type: object
       properties:
@@ -990,7 +1328,7 @@ components:
           type: string
           format: uuid
         value:
-          type: string
+          type: integer
           example: 90
         unit:
           type: string
@@ -1023,6 +1361,15 @@ components:
           example: https://example.com/logo.png
         location:
           $ref: '#/components/schemas/RetailerLocation'
+    RetailersWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Retailer'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     RetailerLocation:
       type: object
       properties:
@@ -1045,7 +1392,7 @@ components:
           example: MN
         zipCode:
           type: string
-          example: 55401
+          example: '55401'
         hours:
           type: array
           items:
@@ -1086,6 +1433,15 @@ components:
           type: number
           format: double
           description: The distance in meters to this location from the search location.
+    RetailerLocationsWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RetailerLocation'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
     User:
       type: object
       properties:
