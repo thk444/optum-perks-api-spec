@@ -59,13 +59,12 @@ paths:
       description: |
         Returns all of the coupons for the specified account ID.
 
-        When available, clients should specify their current location via the `latitude` and `longitude` query parameters. Results should include `nearestLocation` relative to the specified location.
+        When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
 
         When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/latitude'
-        - $ref: '#/components/parameters/longitude'
+        - $ref: '#/components/parameters/location'
       responses:
         '200':
           description: OK
@@ -76,6 +75,8 @@ paths:
     post:
       description: |
         Creates a new coupon for the specified GPI14.
+
+        Note: This endpoint creates a new coupon for the current user, but the coupon will not appear in the current user's coupon list returned by `GET /coupons` until they save it via a separate request to `POST /coupons/{id}/save`.
       parameters:
         - $ref: '#/components/parameters/accountId'
       requestBody:
@@ -97,12 +98,11 @@ paths:
       description: |
         Returns details for the coupon with the specified ID for the specified account ID.
 
-        When available, clients should specify their current location via the `latitude` and `longitude` query parameters. Results should include `nearestLocation` relative to the specified location.
+        When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/couponId'
-        - $ref: '#/components/parameters/latitude'
-        - $ref: '#/components/parameters/longitude'
+        - $ref: '#/components/parameters/location'
       responses:
         '200':
           description: OK
@@ -123,6 +123,24 @@ paths:
           description: No Content
         '404':
           $ref: '#/components/responses/Error404'
+  /coupons/{id}/save:
+    post:
+      description: |
+        Saves the coupon with the specified ID to the current user's coupon list.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/couponId'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coupon'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
   /coupons/{id}/share:
     post:
       description: |
@@ -389,30 +407,28 @@ paths:
   /prices:
     get:
       description: |
-        Returns prices based on the specified GPI14 that encodes brand, form, dosage, and quantity.
+        Returns prices based on the specified GPI14 and quantity.
 
         When `radius` is specified:
-          - `center[latitude]` and `center[longitude]` are required.
+          - `center[location]` is required.
           - Results will be displayed on an interactive map.
           - All matching locations in the search area are are returned.
 
         When `radius` is omitted:
-          - `center[latitude]` and `center[longitude]` are ignored.
+          - `center[location]` is ignored.
           - Only one result per matching retailer is returned for the nearest location to `searchLocation` for that retailer.
 
         When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/gpi14'
+        - $ref: '#/components/parameters/quantity'
         - $ref: '#/components/parameters/searchLocationType'
         - $ref: '#/components/parameters/searchLocationZipCode'
-        - $ref: '#/components/parameters/searchLocationLatitude'
-        - $ref: '#/components/parameters/searchLocationLongitude'
-        - $ref: '#/components/parameters/longitude'
-        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/searchLocationLocation'
+        - $ref: '#/components/parameters/location'
         - $ref: '#/components/parameters/radius'
-        - $ref: '#/components/parameters/centerLatitude'
-        - $ref: '#/components/parameters/centerLongitude'
+        - $ref: '#/components/parameters/centerLocation'
       responses:
         '200':
           description: OK
@@ -443,25 +459,23 @@ paths:
         Results are in order by distance from the search location.
 
         When `radius` is specified:
-          - `center[latitude]` and `center[longitude]` are required.
+          - `center[location]` is required.
           - `page` and `limit` are ignored.
           - Results will be displayed on an interactive map.
           - All matching locations in the search area are are returned.
 
         When `radius` is omitted:
-          - `center[latitude]` and `center[longitude]` are ignored.
+          - `center[location]` is ignored.
 
         When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/retailerId'
-        - $ref: '#/components/parameters/searchLocationRequiredType'
+        - $ref: '#/components/parameters/searchLocationType'
         - $ref: '#/components/parameters/searchLocationZipCode'
-        - $ref: '#/components/parameters/searchLocationLatitude'
-        - $ref: '#/components/parameters/searchLocationLongitude'
+        - $ref: '#/components/parameters/searchLocationLocation'
         - $ref: '#/components/parameters/radius'
-        - $ref: '#/components/parameters/centerLatitude'
-        - $ref: '#/components/parameters/centerLongitude'
+        - $ref: '#/components/parameters/centerLocation'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
       responses:
@@ -482,22 +496,13 @@ components:
         type: string
         format: uuid
       description: The current user's ID, if any.
-    centerLatitude:
+    centerLocation:
       in: query
-      name: center[latitude]
+      name: center[location]
       schema:
-        type: number
-        format: double
-      description: The latitude of the center point of the search area. Required if `radius` is specified.
-      example: 44.949782
-    centerLongitude:
-      in: query
-      name: center[longitude]
-      schema:
-        type: number
-        format: double
-      description: The longitude of the center point of the search area. Required if `radius` is specified.
-      example: -93.285233
+        type: string
+      description: The center point of the search area. Required if `radius` is specified.
+      example: 44.949782,-93.285233
     citiesQuery:
       in: query
       name: q
@@ -576,7 +581,7 @@ components:
         type: string
         example: '39400010100330'
       required: true
-      description: >
+      description: |
         Medispan Generic Product Identifier
         https://www.wolterskluwercdi.com/drug-data/gpi/
     healthConditionId:
@@ -599,14 +604,6 @@ components:
         Filters the results based on the specified value.
           - `common`: Includes the most common health conditions. These are configured by hand on the backend specifically for SEO.
       example: common
-    latitude:
-      in: query
-      name: latitude
-      schema:
-        type: number
-        format: double
-      description: The user's current location latitude.
-      example: 44.949782
     limit:
       in: query
       name: limit
@@ -614,14 +611,13 @@ components:
         type: integer
       description: Indicates how many results to return per page.
       example: 50
-    longitude:
+    location:
       in: query
-      name: longitude
+      name: location
       schema:
-        type: number
-        format: double
-      description: The user's current location longitude.
-      example: -93.285233
+        type: string
+      description: The user's current location.
+      example: 44.949782,-93.285233
     page:
       in: query
       name: page
@@ -629,6 +625,15 @@ components:
         type: integer
       description: Indicates which page of results to load.
       example: 3
+    quantity:
+      in: query
+      name: quantity
+      schema:
+        type: number
+        format: double
+        example: 30
+      required: true
+      description: Indicates how many units are included in the price.
     radius:
       in: query
       name: radius
@@ -645,38 +650,14 @@ components:
         type: string
         format: uuid
       description: The ID for a given retailer.
-    searchLocationLatitude:
+    searchLocationLocation:
       in: query
-      name: searchLocation[latitude]
-      schema:
-        type: number
-        format: double
-      description: The user's current location latitude required when `searchLocation` type is `currentLocation`.
-      example: 44.949782
-    searchLocationLongitude:
-      in: query
-      name: searchLocation[longitude]
-      schema:
-        type: number
-        format: double
-      description: The user's current location longitude required when `searchLocation` type is `currentLocation`.
-      example: -93.285233
-    searchLocationType:
-      in: query
-      name: searchLocation[type]
+      name: searchLocation[location]
       schema:
         type: string
-        enum:
-          - none
-          - zipCode
-          - currentLocation
-      required: true
-      description: |
-        May be none, a ZIP Code, or lat/lng.
-          - `none`: No location information will be provided.
-          - `zipCode`: ZIP Code will be included when the user searched for a city.
-          - `currentLocation`: Latitude and longitude will be included when the user has enabled location services on their device.
-    searchLocationRequiredType:
+      description: The user's current location required when `searchLocation` type is `currentLocation`.
+      example: 44.949782,-93.285233
+    searchLocationType:
       in: query
       name: searchLocation[type]
       schema:
@@ -688,7 +669,7 @@ components:
       description: |
         May be a ZIP Code, or lat/lng.
           - `zipCode`: ZIP Code will be included when the user searched for a city.
-          - `currentLocation`: Latitude and longitude will be included when the user has enabled location services on their device.
+          - `currentLocation`: Location will be included when the user has enabled location services on their device.
     searchLocationZipCode:
       in: query
       name: searchLocation[zipCode]
@@ -717,24 +698,7 @@ components:
           items:
             $ref: '#/components/schemas/AppContent'
         metadata:
-          $ref: '#/components/schemas/PageMetadata'
-    Brand:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-          example: Lipitor
-        forms:
-          type: array
-          items:
-            $ref: '#/components/schemas/Form'
-        defaultFormId:
-          type: string
-          format: uuid
-          description: Will be null if there is no default.
+          $ref: '#/components/schemas/PageMetadataNull'
     CitiesWrapper:
       type: object
       properties:
@@ -743,7 +707,7 @@ components:
           items:
             $ref: '#/components/schemas/City'
         metadata:
-          $ref: '#/components/schemas/PageMetadata'
+          $ref: '#/components/schemas/PageMetadataNull'
     City:
       type: object
       properties:
@@ -791,20 +755,15 @@ components:
           $ref: '#/components/schemas/Price'
         nearestLocation:
           $ref: '#/components/schemas/RetailerLocation'
-    CouponsWrapper:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Coupon'
-        metadata:
-          $ref: '#/components/schemas/PageMetadata'
     CouponPost:
       type: object
       properties:
         gpi14:
           $ref: '#/components/schemas/GPI14'
+        quantity:
+          type: number
+          format: double
+          example: 30
         locationId:
           type: string
           format: uuid
@@ -842,6 +801,15 @@ components:
         phoneNumber:
           type: string
           example: '612-111-1111'
+    CouponsWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coupon'
+        metadata:
+          $ref: '#/components/schemas/PageMetadataNull'
     Device:
       type: object
       properties:
@@ -895,26 +863,6 @@ components:
         appVersion:
           type: string
           example: '1.4'
-    Dosage:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        value:
-          type: integer
-          example: 40
-        unit:
-          type: string
-          example: mg
-        quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/Quantity'
-        defaultQuantityId:
-          type: string
-          format: uuid
-          description: Will be null if there is no default.
     DollarValue:
       type: integer
       example: 1050
@@ -928,38 +876,97 @@ components:
         name:
           type: string
           example: Atorvastatin
+        match:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Atorvastatin
+            otherNames:
+              type: string
+              example: Generic Lipitor
         brands:
           type: array
           items:
-            $ref: '#/components/schemas/Brand'
-        defaultBrandId:
-          type: string
-          format: uuid
-          description: Will be null if the default is generic.
-        forms:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Lipitor
+              urlSlug:
+                type: string
+                example: lipitor
+        formulations:
           type: array
           items:
-            $ref: '#/components/schemas/Form'
-        defaultFormId:
-          type: string
-          format: uuid
-          description: Will be null if there is no default.
+            $ref: '#/components/schemas/Formulation'
+          example:
+            -
+              gpi14: '39400010100330'
+              name: Atorvastatin
+              otherNames: Generic Lipitor
+              form: Tablet
+              dosage: 10 mg
+              commonQuantities:
+                -
+                  value: 30
+                  display: 30 tablets
+                  ndc: '50090-1254-0'
+                -
+                  value: 60
+                  display: 60 tablets
+                  ndc: '50090-1254-1'
+                -
+                  value: 90
+                  display: 90 tablets
+                  ndc: '50090-1254-2'
+            -
+              gpi14: '39400010100360'
+              name: Atorvastatin
+              otherNames: Generic Lipitor
+              form: Tablet
+              dosage: 20 mg
+              commonQuantities:
+                -
+                  value: 30
+                  display: 30 tablets
+                  ndc: '50090-1255-0'
+                -
+                  value: 60
+                  display: 60 tablets
+                  ndc: '50090-1255-1'
+                -
+                  value: 90
+                  display: 90 tablets
+                  ndc: '50090-1255-2'
+            -
+              gpi14: '58200060100105'
+              name: Lipitor
+              otherNames: null
+              form: Tablet
+              dosage: 10 mg
+              commonQuantities:
+                -
+                  value: 60
+                  display: 60 tablets
+                  ndc: '50090-9932-0'
         info:
           type: array
           items:
             $ref: '#/components/schemas/Content'
-        commonBrandNames:
-          type: string
-          example: Lipitor
-        theraputicClassifications:
+        therapeuticClassifications:
           type: string
           example: Antihyperlipidemic
         pharmacologicClassifications:
           type: string
           example: HMG-COA Reductase Inhibitor
-        urlSlug:
-          type: string
-          example: atorvastatin
+        urlSlugs:
+          type: array
+          items:
+            type: string
+          example:
+            - atorvastatin
+            - lipitor
         medicare:
           type: object
           properties:
@@ -1008,13 +1015,26 @@ components:
             <p>This group of drugs causes relaxation of blood vessels as well as a decrease in blood volume, which leads to lower blood pressure and decreased oxygen demand from the heart. They inhibit the angiotensin-converting enzyme, an important component of the renin–angiotensin system.
 
             Frequently prescribed ACE inhibitors include benazepril, zofenopril, perindopril, trandolapril, captopril, enalapril, lisinopril, and ramipril.</p>
-        urlSlug:
-          type: string
-          example: ace-inhibitors
+        urlSlugs:
+          type: array
+          items:
+            type: string
+          example:
+            - ace-inhibitors
+            - ace-inhibitor
         healthConditions:
           items:
             $ref: '#/components/schemas/DrugClassHealthCondition'
           description: Indicates which health conditions this class of drug is popularly prescribed for.
+    DrugClassHealthCondition:
+      type: object
+      properties:
+        healthCondition:
+          $ref: '#/components/schemas/HealthCondition'
+        popularity:
+          type: string
+          example: '35%'
+          description: This value is displayed to the user to indicate popularity.
     DrugClassesWrapper:
       type: object
       properties:
@@ -1023,7 +1043,16 @@ components:
           items:
             $ref: '#/components/schemas/DrugClass'
         metadata:
-          $ref: '#/components/schemas/PageMetadata'
+          $ref: '#/components/schemas/PageMetadataNull'
+    DrugHealthCondition:
+      type: object
+      properties:
+        healthCondition:
+          $ref: '#/components/schemas/HealthCondition'
+        popularity:
+          type: string
+          example: 'Most Popular'
+          description: This value is displayed to the user to indicate popularity.
     DrugsWrapper:
       type: object
       properties:
@@ -1061,27 +1090,37 @@ components:
           format: uuid
         retailer:
           $ref: '#/components/schemas/Retailer'
-    Form:
+    Formulation:
       type: object
       properties:
-        id:
+        drugId:
           type: string
           format: uuid
+        gpi14:
+          $ref: '#/components/schemas/GPI14'
         name:
           type: string
+          example: Atorvastatin
+          description: The name of the drug. This could be the generic name or a brand name.
+        otherNames:
+          type: string
+          example: Generic Lipitor
+          description: This value will be `null` unless this formulation is generic.
+          nullable: true
+        form:
+          type: string
           example: Tablet
-        dosages:
+        dosage:
+          type: string
+          example: 40 mg
+        commonQuantities:
           type: array
           items:
-            $ref: '#/components/schemas/Dosage'
-        defaultDosageId:
-          type: string
-          format: uuid
-          description: Will be null if there is no default.
+            $ref: '#/components/schemas/Quantity'
     GPI14:
       type: string
       example: '39400010100330'
-      description: >
+      description: |
         Medispan Generic Product Identifier
         https://www.wolterskluwercdi.com/drug-data/gpi/
     HealthCondition:
@@ -1114,9 +1153,14 @@ components:
         isCommon:
           type: boolean
           description: Indicates whether or not this is a common health condition.
-        urlSlug:
-          type: string
-          example: allergies
+        urlSlugs:
+          type: array
+          items:
+            type: string
+          example:
+            - allergies
+            - seasonal-allergies
+            - allergic-rhinitis
     HealthConditionsWrapper:
       type: object
       properties:
@@ -1125,7 +1169,7 @@ components:
           items:
             $ref: '#/components/schemas/HealthCondition'
         metadata:
-          $ref: '#/components/schemas/PageMetadata'
+          $ref: '#/components/schemas/PageMetadataNull'
     Image:
       type: object
       properties:
@@ -1155,7 +1199,7 @@ components:
           items:
             $ref: '#/components/schemas/Image'
         metadata:
-          $ref: '#/components/schemas/PageMetadata'
+          $ref: '#/components/schemas/PageMetadataNull'
     KillSwitch:
       type: object
       properties:
@@ -1170,7 +1214,7 @@ components:
               example: New Version Available
             message:
               type: string
-              example: This version is no longer supported. Please updated to the latest version.
+              example: This version is no longer supported. Please update to the latest version.
         url:
           type: string
           example: https://example.com/new-version-info.html
@@ -1188,10 +1232,11 @@ components:
           example: -93.285233
     NDC:
       type: string
-      example: '68645046054'
-      description: >
+      example: '50090-1254-0'
+      description: |
         National Drug Code from the FDA
         https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+      nullable: true
     NotificationPreference:
       type: object
       properties:
@@ -1205,6 +1250,30 @@ components:
             - drugNews
         enabled:
           type: boolean
+    OperatingHours:
+      type: object
+      properties:
+        open:
+          type: object
+          properties:
+            day:
+              type: string
+              example: Sunday
+            time:
+              type: string
+              example: '08:30'
+              description: The hour and minute in 24-hour time.
+        close:
+          type: object
+          properties:
+            day:
+              type: string
+              example: Sunday
+            time:
+              type: string
+              example: '22:00'
+              description: The hour and minute in 24-hour time.
+      description: Indicates a single opening and closing window for this location.
     PageMetadata:
       type: object
       properties:
@@ -1224,6 +1293,9 @@ components:
           type: integer
           example: 1
           description: The total number of pages available.
+    PageMetadataNull:
+      type: object
+      example: null
     Preferences:
       type: object
       properties:
@@ -1257,27 +1329,13 @@ components:
                 format: uuid
               enabled:
                 type: boolean
-    DrugClassHealthCondition:
-      type: object
-      properties:
-        healthCondition:
-          $ref: '#/components/schemas/HealthCondition'
-        popularity:
-          type: string
-          example: '35%'
-          description: This value is displayed to the user to indicate popularity.
-    DrugHealthCondition:
-      type: object
-      properties:
-        healthCondition:
-          $ref: '#/components/schemas/HealthCondition'
-        popularity:
-          type: string
-          example: 'Most Popular'
-          description: This value is displayed to the user to indicate popularity.
     Price:
       type: object
       properties:
+        formulation:
+          $ref: '#/components/schemas/Formulation'
+        quantity:
+          $ref: '#/components/schemas/Quantity'
         retailer:
           $ref: '#/components/schemas/Retailer'
         originalPrice:
@@ -1320,23 +1378,19 @@ components:
           items:
             $ref: '#/components/schemas/Price'
         metadata:
-          $ref: '#/components/schemas/PageMetadata'
+          $ref: '#/components/schemas/PageMetadataNull'
     Quantity:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
         value:
-          type: integer
-          example: 90
-        unit:
+          type: number
+          format: double
+          example: 30
+        display:
           type: string
-          example: tablets
+          example: "30 tablets"
         ndc:
           $ref: '#/components/schemas/NDC'
-        gpi14:
-          $ref: '#/components/schemas/GPI14'
     Retailer:
       type: object
       properties:
@@ -1393,22 +1447,14 @@ components:
         zipCode:
           type: string
           example: '55401'
+        tzDatabaseName:
+          type: string
+          example: America/Chicago
+          description: The `tz database` name for this location's time zone. Used for calculating whether or not this location is open for the current user. This has a slight advantage over UTC offset, since clients can independently account for daylight saving time when applicable.
         hours:
           type: array
           items:
-            type: object
-            properties:
-              dayOfTheWeek:
-                type: string
-                example: Sunday
-              opensAt:
-                type: integer
-                example: 8
-                description: Hour of the day in 24-hour time when the store opens.
-              closesAt:
-                type: integer
-                example: 22
-                description: Hour of the day in 24-hour time when the store closes.
+            $ref: '#/components/schemas/OperatingHours'
         websiteUrl:
           type: string
           example: https://target.com
