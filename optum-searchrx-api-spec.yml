@@ -501,7 +501,7 @@ components:
       name: center[location]
       schema:
         type: string
-      description: The center point of the search area. Required if `radius` is specified.
+      description: The center point of the search area. Required if `radius` is specified. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
     citiesQuery:
       in: query
@@ -613,7 +613,7 @@ components:
       name: location
       schema:
         type: string
-      description: The user's current location.
+      description: The user's current location. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
     page:
       in: query
@@ -652,7 +652,7 @@ components:
       name: searchLocation[location]
       schema:
         type: string
-      description: The user's current location required when `searchLocation` type is `currentLocation`.
+      description: The user's current location required when `searchLocation` type is `currentLocation`. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
     searchLocationType:
       in: query
