@@ -74,7 +74,7 @@ paths:
                 $ref: '#/components/schemas/CouponsWrapper'
     post:
       description: |
-        Creates a new coupon for the specified GPI14.
+        Creates a new coupon for the specified formulation.
 
         Note: This endpoint creates a new coupon for the current user, but the coupon will not appear in the current user's coupon list returned by `GET /coupons` until they save it via a separate request to `POST /coupons/{id}/save`.
       parameters:
@@ -407,7 +407,7 @@ paths:
   /prices:
     get:
       description: |
-        Returns prices based on the specified GPI14 and quantity.
+        Returns prices based on the specified formulation and quantity.
 
         When `radius` is specified:
           - `center[location]` is required.
@@ -421,7 +421,7 @@ paths:
         When the are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/gpi14'
+        - $ref: '#/components/parameters/formulationId'
         - $ref: '#/components/parameters/quantity'
         - $ref: '#/components/parameters/searchLocationType'
         - $ref: '#/components/parameters/searchLocationZipCode'
@@ -574,16 +574,13 @@ components:
           - `popularity`: Sorts results by popularity. Most popular first.
           - `-popularity`: Sorts results by popularity. Least popular first.
       example: name
-    gpi14:
+    formulationId:
       in: query
-      name: gpi14
+      name: formulationId
       schema:
         type: string
-        example: '39400010100330'
+        format: uuid
       required: true
-      description: |
-        Medispan Generic Product Identifier
-        https://www.wolterskluwercdi.com/drug-data/gpi/
     healthConditionId:
       in: path
       name: id
@@ -758,8 +755,9 @@ components:
     CouponPost:
       type: object
       properties:
-        gpi14:
-          $ref: '#/components/schemas/GPI14'
+        formulationId:
+          type: string
+          format: uuid
         quantity:
           type: number
           format: double
@@ -902,6 +900,8 @@ components:
             $ref: '#/components/schemas/Formulation'
           example:
             -
+              id: 30d048c3-4a4a-4c96-902b-9b29317893af
+              drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '39400010100330'
               name: Atorvastatin
               otherNames: Generic Lipitor
@@ -921,6 +921,8 @@ components:
                   display: 90 tablets
                   ndc: '50090-1254-2'
             -
+              id: ee26ed45-dd92-44c0-8e11-fe513420e17b
+              drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '39400010100360'
               name: Atorvastatin
               otherNames: Generic Lipitor
@@ -940,6 +942,8 @@ components:
                   display: 90 tablets
                   ndc: '50090-1255-2'
             -
+              id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
+              drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '58200060100105'
               name: Lipitor
               otherNames: null
@@ -1093,6 +1097,9 @@ components:
     Formulation:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         drugId:
           type: string
           format: uuid
