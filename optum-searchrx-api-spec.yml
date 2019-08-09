@@ -409,14 +409,15 @@ paths:
       description: |
         Returns prices based on the specified formulation and quantity.
 
-        When `radius` is specified:
-          - `center[location]` is required.
+        When `searchLocation[type]` is `map`:
+          - `searchLocation[location]` is required and indicates the center of the search area.
+          - `searchLocation[radius]` is required.
           - Results will be displayed on an interactive map.
           - All matching locations in the search area are are returned.
 
-        When `radius` is omitted:
-          - `center[location]` is ignored.
-          - Only one result per matching retailer is returned for the nearest location to `searchLocation` for that retailer.
+        When `searchLocation[type]` is anything other than `map`:
+          - `searchLocation[radius]` is ignored.
+          - Only one result per matching retailer is returned.
 
         When the are no results, an empty array will be returned.
       parameters:
@@ -426,9 +427,8 @@ paths:
         - $ref: '#/components/parameters/searchLocationType'
         - $ref: '#/components/parameters/searchLocationZipCode'
         - $ref: '#/components/parameters/searchLocationLocation'
+        - $ref: '#/components/parameters/searchLocationRadius'
         - $ref: '#/components/parameters/location'
-        - $ref: '#/components/parameters/radius'
-        - $ref: '#/components/parameters/centerLocation'
       responses:
         '200':
           description: OK
@@ -458,14 +458,15 @@ paths:
 
         Results are in order by distance from the search location.
 
-        When `radius` is specified:
-          - `center[location]` is required.
+        When `searchLocation[type]` is `map`:
+          - `searchLocation[location]` is required and indicates the center of the search area.
+          - `searchLocation[radius]` is required.
           - `page` and `limit` are ignored.
           - Results will be displayed on an interactive map.
           - All matching locations in the search area are are returned.
 
-        When `radius` is omitted:
-          - `center[location]` is ignored.
+        When `searchLocation[type]` is anything other than `map`:
+          - `searchLocation[radius]` is ignored.
 
         When the are no results, an empty array will be returned.
       parameters:
@@ -474,8 +475,7 @@ paths:
         - $ref: '#/components/parameters/searchLocationType'
         - $ref: '#/components/parameters/searchLocationZipCode'
         - $ref: '#/components/parameters/searchLocationLocation'
-        - $ref: '#/components/parameters/radius'
-        - $ref: '#/components/parameters/centerLocation'
+        - $ref: '#/components/parameters/searchLocationRadius'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
       responses:
@@ -496,13 +496,6 @@ components:
         type: string
         format: uuid
       description: The current user's ID, if any.
-    centerLocation:
-      in: query
-      name: center[location]
-      schema:
-        type: string
-      description: The center point of the search area. Required if `radius` is specified. Format is `[latitude],[longitude]`.
-      example: 44.949782,-93.285233
     citiesQuery:
       in: query
       name: q
@@ -631,14 +624,6 @@ components:
         example: 30
       required: true
       description: Indicates how many units are included in the price.
-    radius:
-      in: query
-      name: radius
-      schema:
-        type: number
-        format: double
-      description: The radius in meters of the search area.
-      example: 100
     retailerId:
       in: path
       name: id
@@ -652,8 +637,15 @@ components:
       name: searchLocation[location]
       schema:
         type: string
-      description: The user's current location required when `searchLocation` type is `currentLocation`. Format is `[latitude],[longitude]`.
+      description: The center of the search area. Required when `searchLocation` type is `currentLocation`. Format is `[latitude],[longitude]`. This parameter is required when `searchLocation[type]` is `currentLocation` or `map`.
       example: 44.949782,-93.285233
+    searchLocationRadius:
+      in: query
+      name: searchLocation[radius]
+      schema:
+        type: string
+      description: The radius in meters of a circle centered around `searchLocation[location]`. Matching results within the circle will be returned. This parameter is required when `searchLocation[type]` is `map`.
+      example: 1000.0
     searchLocationType:
       in: query
       name: searchLocation[type]
@@ -662,17 +654,20 @@ components:
         enum:
           - zipCode
           - currentLocation
+          - map
       required: true
       description: |
-        May be a ZIP Code, or lat/lng.
-          - `zipCode`: ZIP Code will be included when the user searched for a city.
-          - `currentLocation`: Location will be included when the user has enabled location services on their device.
+        - `zipCode`: Search within the ZIP Code specified by `searchLocation[zipCode]`. Requires `searchLocation[zipCode]`. At most, one result per retailer will be returned.
+        - `currentLocation`: Search around the user's current location. Requires `searchLocation[location]`. At most, one result per retailer will be returned.
+        - `map`: Search an area of a map. Requires a center point, `searchLocation[location]`, and radius `searchLocation[radius]`. All matching locations inside the search area will be returned.
+      example: zipCode
     searchLocationZipCode:
       in: query
       name: searchLocation[zipCode]
       schema:
         type: string
-      description: The ZIP Code required when `searchLocation` type is `zipCode`.
+      description: The ZIP Code required when `searchLocation[type]` is `zipCode`.
+      example: 55401
   schemas:
     AppContent:
       type: object
@@ -714,6 +709,8 @@ components:
         zip:
           type: string
           example: '55401'
+        coordinates:
+          $ref: '#/components/schemas/Location'
     Content:
       type: object
       properties:
