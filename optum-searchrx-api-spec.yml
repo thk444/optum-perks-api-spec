@@ -903,7 +903,11 @@ components:
               name: Atorvastatin
               otherNames: Generic Lipitor
               form: Tablet
-              dosage: 10 mg
+              pluralForm: Tablets
+              dosage:
+                value: 10
+                unit: mg
+                display: 10 mg
               commonQuantities:
                 -
                   value: 30
@@ -924,7 +928,11 @@ components:
               name: Atorvastatin
               otherNames: Generic Lipitor
               form: Tablet
-              dosage: 20 mg
+              pluralForm: Tablets
+              dosage:
+                value: 20
+                unit: mg
+                display: 20 mg
               commonQuantities:
                 -
                   value: 30
@@ -945,7 +953,11 @@ components:
               name: Lipitor
               otherNames: null
               form: Tablet
-              dosage: 10 mg
+              pluralForm: Tablets
+              dosage:
+                value: 10
+                unit: mg
+                display: 10 mg
               commonQuantities:
                 -
                   value: 60
@@ -1114,9 +1126,22 @@ components:
         form:
           type: string
           example: Tablet
-        dosage:
+        pluralForm:
           type: string
-          example: 40 mg
+          example: Tablets
+        dosage:
+          type: object
+          properties:
+            value:
+              type: number
+              format: double
+              example: 40
+            unit:
+              type: string
+              example: mg
+            display:
+              type: string
+              example: 40 mg
         commonQuantities:
           type: array
           items:
