@@ -1399,6 +1399,7 @@ components:
           items:
             $ref: '#/components/schemas/Price'
           description: Nested price objects for comparison to this price.
+          example: [] # Note: Swagger doesn't currently allow recursive objects, so leave this [].
     PricesWrapper:
       type: object
       properties:
