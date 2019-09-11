@@ -446,13 +446,11 @@ paths:
         Results are in order by distance from the search location.
 
         When `searchLocation[type]` is `map`:
-          - `searchLocation[location]` is required and indicates the center of the search area.
           - `searchLocation[radius]` is required.
           - `page` and `limit` are ignored.
           - Results will be displayed on an interactive map.
-          - All matching locations in the search area are are returned.
 
-        When `searchLocation[type]` is anything other than `map`:
+        When `searchLocation[type]` is `currentLocation`:
           - `searchLocation[radius]` is ignored.
 
         When the are no results, an empty array will be returned.
@@ -629,9 +627,10 @@ components:
     searchLocationLocation:
       in: query
       name: searchLocation[location]
+      required: true
       schema:
         type: string
-      description: The center of the search area. Required when `searchLocation` type is `currentLocation`. Format is `[latitude],[longitude]`. This parameter is required when `searchLocation[type]` is `currentLocation` or `map`.
+      description: The center of the search area. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
     searchLocationRadius:
       in: query
@@ -650,8 +649,8 @@ components:
           - map
       required: true
       description: |
-        - `currentLocation`: Search around the user's current location. Requires `searchLocation[location]`. At most, one result per retailer will be returned.
-        - `map`: Search an area of a map. Requires a center point, `searchLocation[location]`, and radius `searchLocation[radius]`. All matching locations inside the search area will be returned.
+        - `currentLocation`: Search around the user's current location.
+        - `map`: Search an area of a map. Requires a center point and radius `searchLocation[radius]`.
       example: map
   schemas:
     AppContent:
