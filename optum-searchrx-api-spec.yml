@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '1.0.0'
+  version: '0.7.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -188,11 +188,8 @@ paths:
     get:
       description: |
         Returns a list of drugs that match the query parameters.
-
-        This endpoint is intended to be used to display results in real time as the user types.
       parameters:
         - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/drugsQuery'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/drugsFilter'
@@ -471,6 +468,27 @@ paths:
                 $ref: '#/components/schemas/RetailerLocationsWrapper'
         '404':
           $ref: '#/components/responses/Error404'
+  /search:
+    get:
+      description: |
+        Returns a list of search results that match the query parameters.
+
+        Search results can be drugs, drug classes, or health conditions.
+
+        This endpoint is intended to be used to display results in real time as the user types.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/searchQuery'
+        - $ref: '#/components/parameters/searchType'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchWrapper'
 components:
   parameters:
     accountId:
@@ -526,13 +544,6 @@ components:
           - `common`: Includes the most common drugs. These are configured by hand on the backend specifically for SEO.
           - `popular`: Includes the most popular drugs.
       example: common
-    drugsQuery:
-      in: query
-      name: q
-      schema:
-        type: string
-      description: Query to match all or part of a drug's generic or brand name.
-      example: Atorvastatin
     drugsSort:
       in: query
       name: sort
@@ -652,6 +663,26 @@ components:
         - `currentLocation`: Search around the user's current location.
         - `map`: Search an area of a map. Requires a center point and radius `searchLocation[radius]`.
       example: map
+    searchQuery:
+      in: query
+      name: q
+      schema:
+        type: string
+      required: true
+      description: Query that describes what to search for. For drugs, this value can match any part of a drug's generic or brand names.
+      example: Atorvastatin
+    searchType:
+      in: query
+      name: type
+      schema:
+        type: string
+        enum:
+          - drug
+          - drugClass
+          - healthCondition
+        default: drug
+      required: false
+      description: Restricts results to include values of the specified type. If no value is specified, `drug` is used.
   schemas:
     AppContent:
       type: object
@@ -855,15 +886,10 @@ components:
         name:
           type: string
           example: Atorvastatin
-        match:
-          type: object
-          properties:
-            name:
-              type: string
-              example: Atorvastatin
-            otherNames:
-              type: string
-              example: Generic Lipitor
+        otherNames:
+          type: string
+          example: Generic Lipitor
+          description: This value will be `null` unless this formulation is generic.
         brands:
           type: array
           items:
@@ -1502,6 +1528,53 @@ components:
             $ref: '#/components/schemas/RetailerLocation'
         metadata:
           $ref: '#/components/schemas/PageMetadata'
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - drug
+            - drugClass
+            - healthCondition
+        title:
+          type: string
+        subtitle:
+          type: string
+    SearchWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+        metadata:
+          $ref: '#/components/schemas/PageMetadata'
+      example:
+        data:
+          -
+            id: 4de2d854-cdef-4cb7-a5f6-5996b0120a75
+            type: drug
+            title: Atorvastatin
+            subtitle: Generic Lipitor
+          -
+            id: 9bd9b0f5-261a-4b5e-9fd6-394fa54582c7
+            type: drug
+            title: Lipitor
+            subtitle: Atorvastatin
+          -
+            id: 9cf9ef80-59d9-446b-b311-2caeaaeff43c
+            type: drug
+            title: Altoprev
+            subtitle: null
+        metadata:
+          count: 1
+          currentPage: 1
+          totalCount: 3
+          totalPages: 1
     User:
       type: object
       properties:
