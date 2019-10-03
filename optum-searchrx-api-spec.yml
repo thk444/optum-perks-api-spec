@@ -409,25 +409,12 @@ paths:
       description: |
         Returns prices based on the specified formulation and quantity.
 
-        When `searchLocation[type]` is `map`:
-          - `searchLocation[location]` is required and indicates the center of the search area.
-          - `searchLocation[radius]` is required.
-          - Results will be displayed on an interactive map.
-          - All matching locations in the search area are are returned.
-
-        When `searchLocation[type]` is anything other than `map`:
-          - `searchLocation[radius]` is ignored.
-          - Only one result per matching retailer is returned.
-
-        When the are no results, an empty array will be returned.
+        The 20 results nearest to `searchLocation` will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/formulationId'
         - $ref: '#/components/parameters/quantity'
-        - $ref: '#/components/parameters/searchLocationType'
-        - $ref: '#/components/parameters/searchLocationZipCode'
-        - $ref: '#/components/parameters/searchLocationLocation'
-        - $ref: '#/components/parameters/searchLocationRadius'
+        - $ref: '#/components/parameters/searchLocation'
         - $ref: '#/components/parameters/location'
       responses:
         '200':
@@ -459,13 +446,11 @@ paths:
         Results are in order by distance from the search location.
 
         When `searchLocation[type]` is `map`:
-          - `searchLocation[location]` is required and indicates the center of the search area.
           - `searchLocation[radius]` is required.
           - `page` and `limit` are ignored.
           - Results will be displayed on an interactive map.
-          - All matching locations in the search area are are returned.
 
-        When `searchLocation[type]` is anything other than `map`:
+        When `searchLocation[type]` is `currentLocation`:
           - `searchLocation[radius]` is ignored.
 
         When the are no results, an empty array will be returned.
@@ -473,7 +458,6 @@ paths:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/retailerId'
         - $ref: '#/components/parameters/searchLocationType'
-        - $ref: '#/components/parameters/searchLocationZipCode'
         - $ref: '#/components/parameters/searchLocationLocation'
         - $ref: '#/components/parameters/searchLocationRadius'
         - $ref: '#/components/parameters/page'
@@ -632,12 +616,21 @@ components:
         type: string
         format: uuid
       description: The ID for a given retailer.
+    searchLocation:
+      in: query
+      name: searchLocation
+      required: true
+      schema:
+        type: string
+      description: The center of the search area. Format is `[latitude],[longitude]`.
+      example: 44.949782,-93.285233
     searchLocationLocation:
       in: query
       name: searchLocation[location]
+      required: true
       schema:
         type: string
-      description: The center of the search area. Required when `searchLocation` type is `currentLocation`. Format is `[latitude],[longitude]`. This parameter is required when `searchLocation[type]` is `currentLocation` or `map`.
+      description: The center of the search area. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
     searchLocationRadius:
       in: query
@@ -652,22 +645,13 @@ components:
       schema:
         type: string
         enum:
-          - zipCode
           - currentLocation
           - map
       required: true
       description: |
-        - `zipCode`: Search within the ZIP Code specified by `searchLocation[zipCode]`. Requires `searchLocation[zipCode]`. At most, one result per retailer will be returned.
-        - `currentLocation`: Search around the user's current location. Requires `searchLocation[location]`. At most, one result per retailer will be returned.
-        - `map`: Search an area of a map. Requires a center point, `searchLocation[location]`, and radius `searchLocation[radius]`. All matching locations inside the search area will be returned.
-      example: zipCode
-    searchLocationZipCode:
-      in: query
-      name: searchLocation[zipCode]
-      schema:
-        type: string
-      description: The ZIP Code required when `searchLocation[type]` is `zipCode`.
-      example: 55401
+        - `currentLocation`: Search around the user's current location.
+        - `map`: Search an area of a map. Requires a center point and radius `searchLocation[radius]`.
+      example: map
   schemas:
     AppContent:
       type: object
