@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.10.0'
+  version: '0.11.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -16,6 +16,8 @@ paths:
     post:
       description: |
         Creates a new anonymous user account.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
       responses:
         '201':
           description: Created
@@ -32,6 +34,7 @@ paths:
 
         When the are no results, an empty array will be returned.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/citiesQuery'
       responses:
@@ -46,6 +49,7 @@ paths:
       description: |
         Returns dynamic app content.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
       responses:
         '200':
@@ -63,6 +67,7 @@ paths:
 
         When the are no results, an empty array will be returned.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/location'
       responses:
@@ -78,6 +83,7 @@ paths:
 
         Note: This endpoint creates a new coupon for the current user, but the coupon will not appear in the current user's coupon list returned by `GET /coupons` until they save it via a separate request to `POST /coupons/{id}/save`.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
       requestBody:
         content:
@@ -100,6 +106,7 @@ paths:
 
         When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/couponId'
         - $ref: '#/components/parameters/location'
@@ -128,6 +135,7 @@ paths:
       description: |
         Saves the coupon with the specified ID to the current user's coupon list.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/couponId'
       responses:
@@ -146,6 +154,7 @@ paths:
       description: |
         Shares an existing coupon for the specified coupon ID and account ID.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/couponId'
       requestBody:
@@ -169,6 +178,7 @@ paths:
       description: |
         Creates a new device for the current user with the specified properties.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
       requestBody:
         content:
@@ -189,6 +199,7 @@ paths:
       description: |
         Returns details for the discount card with the specified ID.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/discountCardId'
       responses:
@@ -205,6 +216,7 @@ paths:
       description: |
         Returns a list of drugs that match the query parameters.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
@@ -222,6 +234,7 @@ paths:
       description: |
         Returns the drug with the specified ID.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/drugId'
       responses:
@@ -240,6 +253,7 @@ paths:
 
         When the are no results, an empty array will be returned.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/drugId'
       responses:
@@ -256,6 +270,7 @@ paths:
       description: |
         Returns all the drug classes.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
       responses:
         '200':
@@ -269,6 +284,7 @@ paths:
       description: |
         Returns the drug class with the specified ID.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/drugClassId'
       responses:
@@ -285,6 +301,7 @@ paths:
       description: |
         Returns drugs associated with the specified drug class.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/drugClassId'
         - $ref: '#/components/parameters/limit'
@@ -303,6 +320,7 @@ paths:
       description: |
         Returns all the health conditions.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/healthConditionsFilter'
       responses:
@@ -317,6 +335,7 @@ paths:
       description: |
         Returns the health condition with the specified ID.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/healthConditionId'
       responses:
@@ -333,6 +352,7 @@ paths:
       description: |
         Returns drugs associated with the specified health condition.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/healthConditionId'
         - $ref: '#/components/parameters/limit'
@@ -351,6 +371,7 @@ paths:
       description: |
         Check to see if a given client is still supported.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - name: platform
           in: query
@@ -390,6 +411,7 @@ paths:
       description: |
         Returns the current user's preferences.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
       responses:
         '200':
@@ -402,6 +424,7 @@ paths:
       description: |
         Updates the current user's preferences.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
       requestBody:
         content:
@@ -424,6 +447,7 @@ paths:
 
         The 20 results nearest to `searchLocation` will be returned.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/formulationId'
         - $ref: '#/components/parameters/quantity'
@@ -441,6 +465,7 @@ paths:
       description: |
         Returns retailers sorted alphabetically.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/limit'
@@ -468,6 +493,7 @@ paths:
 
         When the are no results, an empty array will be returned.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/retailerId'
         - $ref: '#/components/parameters/searchLocationType'
@@ -493,6 +519,7 @@ paths:
 
         This endpoint is intended to be used to display results in real time as the user types.
       parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/searchQuery'
         - $ref: '#/components/parameters/searchType'
@@ -507,6 +534,13 @@ paths:
                 $ref: '#/components/schemas/SearchWrapper'
 components:
   parameters:
+    acceptLanguage:
+      in: header
+      name: Accept-Language
+      schema:
+        type: string
+        example: en-US
+      description: Specifies which language the client is able to understand. When specified, the server should localize dynamic data, like prices and content, based on the specified language code. Static labels on the client, like headings and button labels, will be localized on the client.
     accountId:
       in: header
       name: X-Account-ID
