@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.11.0'
+  version: '0.12.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -1642,11 +1642,6 @@ components:
             url:
               type: string
               example: https://www.yelp.com/biz/target-minneapolis-2
-          nullable: true
-        distanceFromSearchLocation:
-          type: number
-          format: double
-          description: The distance in meters to this location from the search location. This value is only included when relevant. For example, this value must be present when this location is returned as part of a response to a price query.
           nullable: true
     RetailerLocationsWrapper:
       type: object
