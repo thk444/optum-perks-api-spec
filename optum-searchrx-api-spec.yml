@@ -30,7 +30,7 @@ paths:
 
         This endpoint is intended to be used to display results in real time as the user types.
 
-        When the are no results, an empty array will be returned.
+        When there are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/citiesQuery'
@@ -61,7 +61,7 @@ paths:
 
         When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
 
-        When the are no results, an empty array will be returned.
+        When there are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/location'
@@ -188,6 +188,8 @@ paths:
     get:
       description: |
         Returns a list of drugs that match the query parameters.
+
+        When there are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/page'
@@ -222,7 +224,7 @@ paths:
       description: |
         Returns images for the drug with the specified ID.
 
-        When the are no results, an empty array will be returned.
+        When there are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/drugId'
@@ -450,7 +452,7 @@ paths:
         When `searchLocation[type]` is `currentLocation`:
           - `searchLocation[radius]` is ignored.
 
-        When the are no results, an empty array will be returned.
+        When there are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/retailerId'
@@ -476,6 +478,8 @@ paths:
         Search results can be drugs, drug classes, or health conditions.
 
         This endpoint is intended to be used to display results in real time as the user types.
+
+        When there are no results, an empty array will be returned.
       parameters:
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/searchQuery'
