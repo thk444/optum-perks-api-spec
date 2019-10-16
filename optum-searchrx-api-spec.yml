@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.9.0'
+  version: '0.10.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -184,6 +184,22 @@ paths:
                 $ref: '#/components/schemas/Device'
         '422':
           $ref: '#/components/responses/Error422'
+  /discount-cards/{id}:
+    get:
+      description: |
+        Returns details for the discount card with the specified ID.
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/discountCardId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountCard'
+        '404':
+          $ref: '#/components/responses/Error404'
   /drugs:
     get:
       description: |
@@ -518,6 +534,14 @@ components:
         type: string
         format: uuid
       description: The ID for a given coupon.
+    discountCardId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The `urlSlug` or ID for a given discount card.
     drugClassId:
       in: path
       name: id
@@ -881,6 +905,28 @@ components:
         appVersion:
           type: string
           example: '1.4'
+    DiscountCard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pageTitle:
+          type: string
+          example: Get your free AARP Discount Card!
+        partnerName:
+          type: string
+          example: AARP
+        partnerLogoUrl:
+          type: string
+          example: https://example.com/logo.png
+        discountCardImageUrl:
+          type: string
+          example: https://example.com/image.png
+        urlSlug:
+          type: string
+          example: aarp
+          nullable: true
     Drug:
       type: object
       properties:
