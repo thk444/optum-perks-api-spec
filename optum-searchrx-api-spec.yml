@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.7.0'
+  version: '0.8.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -812,9 +812,11 @@ components:
         email:
           type: string
           format: email
+          description: Required when `shareType` is `email`.
         phoneNumber:
           type: string
           example: '612-111-1111'
+          description: Required when `shareType` is `textMessage`.
     CouponsWrapper:
       type: object
       properties:
@@ -833,7 +835,8 @@ components:
         deviceToken:
           type: string
           format: uuid
-          description: Push notification token provided by iOS or Android.
+          description: Push notification token provided by iOS or Android. This value is not always immediately available, so it's optional. The device may make a second post that includes this value.
+          nullable: true
         deviceIdentifier:
           type: string
           format: uuid
@@ -858,7 +861,8 @@ components:
         deviceToken:
           type: string
           format: uuid
-          description: Push notification token provided by iOS or Android.
+          description: Push notification token provided by iOS or Android. This value is not always immediately available, so it's optional. The device may make a second post that includes this value. If a record already exists for this device, then the values should be updated.
+          nullable: true
         deviceIdentifier:
           type: string
           format: uuid
@@ -894,6 +898,7 @@ components:
           type: string
           example: Generic Lipitor
           description: This value will be `null` unless this formulation is generic.
+          nullable: true
         brands:
           type: array
           items:
@@ -905,6 +910,7 @@ components:
               urlSlug:
                 type: string
                 example: lipitor
+                nullable: true
         formulations:
           type: array
           items:
@@ -984,9 +990,11 @@ components:
         therapeuticClassifications:
           type: string
           example: Antihyperlipidemic
+          nullable: true
         pharmacologicClassifications:
           type: string
           example: HMG-COA Reductase Inhibitor
+          nullable: true
         urlSlugs:
           type: array
           items:
@@ -1002,15 +1010,18 @@ components:
             explanation:
               type: string
               example: 100% of Medicare Part D and Medicare Advantage plans cover this drug.
+              nullable: true
         sideEffects:
           type: object
           properties:
             overview:
               type: string
               example: This is not a complete list of side effects and others may occur. Call your doctor for medical advice about side effects.
+              nullable: true
             commonSideEffectsOverview:
               type: string
               example: Aliquam in scelerisque neque, vitae dignissim eros. In non luctus augue, sed pellentesque risus. Etiam pellentesque rutrum elit, eu lobortis turpis efficitur ullamcorper.
+              nullable: true
             commonSideEffects:
               type: array
               items:
@@ -1019,6 +1030,7 @@ components:
             rareSideEffectsOverview:
               type: string
               example: Aliquam in scelerisque neque, vitae dignissim eros. In non luctus augue, sed pellentesque risus. Etiam pellentesque rutrum elit, eu lobortis turpis efficitur ullamcorper.
+              nullable: true
             rareSideEffects:
               type: array
               items:
@@ -1036,12 +1048,14 @@ components:
         description:
           type: string
           example: An angiotensin-converting-enzyme inhibitor (ACE inhibitor) is a pharmaceutical drug used primarily for the treatment of hypertension (elevated blood pressure) and congestive heart failure.
+          nullable: true
         html:
           type: string
           example: >
             <p>This group of drugs causes relaxation of blood vessels as well as a decrease in blood volume, which leads to lower blood pressure and decreased oxygen demand from the heart. They inhibit the angiotensin-converting enzyme, an important component of the renin–angiotensin system.
 
             Frequently prescribed ACE inhibitors include benazepril, zofenopril, perindopril, trandolapril, captopril, enalapril, lisinopril, and ramipril.</p>
+          nullable: true
         urlSlugs:
           type: array
           items:
@@ -1062,6 +1076,7 @@ components:
           type: string
           example: '35%'
           description: This value is displayed to the user to indicate popularity.
+          nullable: true
     DrugClassesWrapper:
       type: object
       properties:
@@ -1106,9 +1121,11 @@ components:
               fieldName:
                 type: string
                 example: '{fieldName}'
+                nullable: true
               message:
                 type: string
                 example: The {fieldName} field cannot be blank.
+                nullable: true
     FavoriteLocationPreference:
       type: object
       properties:
@@ -1128,6 +1145,7 @@ components:
           format: uuid
         gpi14:
           $ref: '#/components/schemas/GPI14'
+          nullable: true
         name:
           type: string
           example: Atorvastatin
@@ -1143,6 +1161,7 @@ components:
         pluralForm:
           type: string
           example: Tablets
+          nullable: true
         dosage:
           type: object
           properties:
@@ -1180,19 +1199,24 @@ components:
           type: string
           description: Commonly known as.
           example: Allergies
+          nullable: true
         description:
           type: string
           example: This is a brief description of the health condition.
+          nullable: true
         html:
           type: string
           example: >
             <p>A damaging immune response by the body to a substance, especially pollen, fur, a particular food, or dust, to which it has become hypersensitive.</p>
+          nullable: true
         heroImageUrl:
           type: string
           example: https://example.com/image.png
+          nullable: true
         heroIconUrl:
           type: string
           example: https://example.com/image.png
+          nullable: true
         isCommon:
           type: boolean
           description: Indicates whether or not this is a common health condition.
@@ -1228,12 +1252,15 @@ components:
         appearance:
           type: string
           example: Yellow, round tablet
+          nullable: true
         imprint:
           type: string
           example: HLA 40
+          nullable: true
         manufacturer:
           type: string
           example: Teva Pharmaceuticals USA
+          nullable: true
     ImagesWrapper:
       type: object
       properties:
@@ -1262,6 +1289,7 @@ components:
           type: string
           example: https://example.com/new-version-info.html
           description: The user can open this URL to review upgrade details or install the latest version of the app.
+          nullable: true
     Location:
       type: object
       properties:
@@ -1454,6 +1482,7 @@ components:
         membershipDetailsUrl:
           type: string
           example: https://rcam.target.com/#/
+          nullable: true
         logoUrl:
           type: string
           example: https://example.com/logo.png
@@ -1480,21 +1509,27 @@ components:
         addressLine1:
           type: string
           example: 123 Main St.
+          nullable: true
         addressLine2:
           type: string
+          nullable: true
         city:
           type: string
           example: Minneapolis
+          nullable: true
         state:
           type: string
           example: MN
+          nullable: true
         zipCode:
           type: string
           example: '55401'
+          nullable: true
         tzDatabaseName:
           type: string
           example: America/Chicago
           description: The `tz database` name for this location's time zone. Used for calculating whether or not this location is open for the current user. This has a slight advantage over UTC offset, since clients can independently account for daylight saving time when applicable.
+          nullable: true
         hours:
           type: array
           items:
@@ -1502,9 +1537,11 @@ components:
         websiteUrl:
           type: string
           example: https://target.com
+          nullable: true
         phoneNumber:
           type: string
           example: (612) 111-1111
+          nullable: true
         coordinates:
           $ref: '#/components/schemas/Location'
         rating:
@@ -1519,10 +1556,12 @@ components:
             url:
               type: string
               example: https://www.yelp.com/biz/target-minneapolis-2
+          nullable: true
         distanceFromSearchLocation:
           type: number
           format: double
-          description: The distance in meters to this location from the search location.
+          description: The distance in meters to this location from the search location. This value is only included when relevant. For example, this value must be present when this location is returned as part of a response to a price query.
+          nullable: true
     RetailerLocationsWrapper:
       type: object
       properties:
@@ -1548,6 +1587,7 @@ components:
           type: string
         subtitle:
           type: string
+          nullable: true
     SearchWrapper:
       type: object
       properties:
