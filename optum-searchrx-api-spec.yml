@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.15.0'
+  version: '0.16.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -1116,6 +1116,19 @@ components:
                   value: 60
                   display: 60 tablets
                   ndc: '50090-9932-0'
+        defaultFormulation:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 30d048c3-4a4a-4c96-902b-9b29317893af
+            quantity:
+              type: number
+              format: double
+              example: 30
+          nullable: true
+          description: Indicates which formulation and quantity should be selected by default when displayed in the prescription settings view. This object may be null.
         info:
           type: array
           items:
