@@ -194,10 +194,10 @@ paths:
                 $ref: '#/components/schemas/Device'
         '422':
           $ref: '#/components/responses/Error422'
-  /discount-cards/{id}:
+  /discount-cards/{id-or-urlSlug}:
     get:
       description: |
-        Returns details for the discount card with the specified ID.
+        Returns details for the discount card with the specified ID or URL slug.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -231,10 +231,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DrugsWrapper'
-  /drugs/{id}:
+  /drugs/{id-or-urlSlug}:
     get:
       description: |
-        Returns the drug with the specified ID.
+        Returns the drug with the specified ID or URL slug.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -248,10 +248,10 @@ paths:
                 $ref: '#/components/schemas/Drug'
         '404':
           $ref: '#/components/responses/Error404'
-  /drugs/{id}/images:
+  /drugs/{id-or-urlSlug}/images:
     get:
       description: |
-        Returns images for the drug with the specified ID.
+        Returns images for the drug with the specified ID or URL slug.
 
         When there are no results, an empty array will be returned.
       parameters:
@@ -281,10 +281,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DrugClassesWrapper'
-  /drug-classes/{id}:
+  /drug-classes/{id-or-urlSlug}:
     get:
       description: |
-        Returns the drug class with the specified ID.
+        Returns the drug class with the specified ID or URL slug.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -298,7 +298,7 @@ paths:
                 $ref: '#/components/schemas/DrugClass'
         '404':
           $ref: '#/components/responses/Error404'
-  /drug-classes/{id}/drugs:
+  /drug-classes/{id-or-urlSlug}/drugs:
     get:
       description: |
         Returns drugs associated with the specified drug class.
@@ -332,10 +332,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthConditionsWrapper'
-  /health-conditions/{id}:
+  /health-conditions/{id-or-urlSlug}:
     get:
       description: |
-        Returns the health condition with the specified ID.
+        Returns the health condition with the specified ID or `urlSlug`.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -349,7 +349,7 @@ paths:
                 $ref: '#/components/schemas/HealthCondition'
         '404':
           $ref: '#/components/responses/Error404'
-  /health-conditions/{id}/drugs:
+  /health-conditions/{id-or-urlSlug}/drugs:
     get:
       description: |
         Returns drugs associated with the specified health condition.
@@ -570,28 +570,28 @@ components:
       description: The ID for a given coupon.
     discountCardId:
       in: path
-      name: id
+      name: id-or-urlSlug
       required: true
       schema:
         type: string
         format: uuid
-      description: The `urlSlug` or ID for a given discount card.
+      description: The ID or `urlSlug` for a given discount card.
     drugClassId:
       in: path
-      name: id
+      name: id-or-urlSlug
       required: true
       schema:
         type: string
         format: uuid
-      description: The ID for a drug class.
+      description: The ID or `urlSlug` for a drug class.
     drugId:
       in: path
-      name: id
+      name: id-or-urlSlug
       required: true
       schema:
         type: string
         format: uuid
-      description: The ID for a given drug.
+      description: The ID or `urlSlug` for a given drug.
     drugsFilter:
       in: query
       name: filter
@@ -633,12 +633,12 @@ components:
       required: true
     healthConditionId:
       in: path
-      name: id
+      name: id-or-urlSlug
       required: true
       schema:
         type: string
         format: uuid
-      description: The ID for a health condition.
+      description: The ID or `urlSlug` for a health condition.
     healthConditionsFilter:
       in: query
       name: filter
@@ -1071,13 +1071,9 @@ components:
           type: string
           example: HMG-COA Reductase Inhibitor
           nullable: true
-        urlSlugs:
-          type: array
-          items:
-            type: string
-          example:
-            - atorvastatin
-            - lipitor
+        urlSlug:
+          type: string
+          example: atorvastatin
         medicare:
           type: object
           properties:
@@ -1132,13 +1128,9 @@ components:
 
             Frequently prescribed ACE inhibitors include benazepril, zofenopril, perindopril, trandolapril, captopril, enalapril, lisinopril, and ramipril.</p>
           nullable: true
-        urlSlugs:
-          type: array
-          items:
-            type: string
-          example:
-            - ace-inhibitors
-            - ace-inhibitor
+        urlSlug:
+          type: string
+          example: ace-inhibitors
         healthConditions:
           items:
             $ref: '#/components/schemas/DrugClassHealthCondition'
@@ -1296,14 +1288,9 @@ components:
         isCommon:
           type: boolean
           description: Indicates whether or not this is a common health condition.
-        urlSlugs:
-          type: array
-          items:
-            type: string
-          example:
-            - allergies
-            - seasonal-allergies
-            - allergic-rhinitis
+        urlSlug:
+          type: string
+          example: allergies
     HealthConditionsWrapper:
       type: object
       properties:
