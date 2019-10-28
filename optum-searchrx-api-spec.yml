@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.12.0'
+  version: '0.15.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -149,10 +149,10 @@ paths:
           $ref: '#/components/responses/Error404'
         '422':
           $ref: '#/components/responses/Error422'
-  /coupons/{id}/share:
+  /coupons/{id}/copy:
     post:
       description: |
-        Shares an existing coupon for the specified coupon ID and account ID.
+        Copies an existing coupon for the specified coupon ID and account ID for sharing via a mobile OS share sheet.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -161,14 +161,40 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/CouponSharePost'
+              $ref: '#/components/schemas/CouponCopyPost'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CouponShare'
+                $ref: '#/components/schemas/CouponCopy'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
+  /coupons/{id}/send:
+    post:
+      description: |
+        Sends a copy of the coupon for the specified coupon ID and account ID to the specified recipient.
+
+        Note: This endpoint is not intended to be used by mobile clients. Use `POST /coupons/{id}/copy` to copy a coupon for sharing via a mobile OS share sheet.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/couponId'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CouponSendPost'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coupon'
         '404':
           $ref: '#/components/responses/Error404'
         '422':
@@ -822,10 +848,59 @@ components:
         uid:
           type: string
           example: ABC1234567
+        url:
+          type: string
+          example: https://bit.ly/2MUVNgT
         price:
           $ref: '#/components/schemas/Price'
         nearestLocation:
           $ref: '#/components/schemas/RetailerLocation'
+    CouponCopy:
+      type: object
+      properties:
+        textBody:
+          type: string
+          example: >
+            Here's your coupon for Atorvastatin. Show this to your pharmacist:
+
+            MemberID: ABC1234567
+            RxGroup: ABC123
+            RxBin: 009999
+            RxPCN: ABCDEF
+            https://searchrx.com/123
+        emailBody:
+          type: string
+          example: >
+            <html>
+              <head>
+                <title>Here is your Atovastatin coupon</title>
+              </head>
+              <body>
+                <table>
+                  <tr>
+                    <td>
+                      Show this to your pharmacist at your local Walmart pharmacy.
+                    </td>
+                  </tr>
+                </table>
+              </body>
+            </html>
+        subjectLine:
+          type: string
+          example: Here is your Atorvastatin Coupon
+        coupon:
+          $ref: '#/components/schemas/Coupon'
+    CouponCopyPost:
+      type: object
+      properties:
+        destination:
+          type: string
+          enum:
+            - textMessage
+            - email
+            - copyLink
+            - other
+          description: This value indicates how the user intends to share the coupon. The server will respond with the full response payload regardless of which `destination` is specified.
     CouponPost:
       type: object
       properties:
@@ -839,42 +914,24 @@ components:
         locationId:
           type: string
           format: uuid
-    CouponShare:
+    CouponSendPost:
       type: object
       properties:
-        defaultShareText:
-          type: string
-          example: >
-            Atorvastatin Card:
-            MemberID: ABC1234567
-            RxGroup: ABC123
-            RxBin: 009999
-            RxPCN: ABCDEF
-            Pharmacist: 1-888-111-1111
-            Questions: 1-888-111-1111
-            https://searchrx.com/123
-        defaultShareImageUrl:
-          type: string
-          example: https://example.com/coupon.png
-        coupon:
-          $ref: '#/components/schemas/Coupon'
-    CouponSharePost:
-      type: object
-      properties:
-        shareType:
+        sendType:
           type: string
           enum:
-            - textMessage
             - email
-            - mobileAppShareSheet
+            - textMessage
         email:
           type: string
           format: email
-          description: Required when `shareType` is `email`.
+          description: Required when `sendType` is `email`.
+          nullable: true
         phoneNumber:
           type: string
-          example: '612-111-1111'
-          description: Required when `shareType` is `textMessage`.
+          example: null
+          description: Required when `sendType` is `textMessage`.
+          nullable: true
     CouponsWrapper:
       type: object
       properties:
