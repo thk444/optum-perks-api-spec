@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.16.0'
+  version: '0.17.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -548,6 +548,13 @@ paths:
         This endpoint is intended to be used to display results in real time as the user types.
 
         When there are no results, an empty array will be returned.
+
+        Additional context for drug search results:
+        * Search results will include drugs where the generic name or brand name is a partial or exact match for the `q` param value. It doesn’t matter if drugs are brand name or generic: all matches will be returned.
+        * For search results, `title` is always `drug.name`. `drug.name` can be either a generic name or brand name.
+        * For generic search results, if there is a known brand name for the drug, `subtitle` should be the phrase `Generic [brand name]`, e.g. “Generic Lipitor”.
+        * For brand name search results, if there’s a known generic name, `subtitle` should be the generic name. e.g. “Atorvastatin”.
+        * The ID of the search result will match the generic drug when available. So if both "Atorvastatin" and "Lipitor" appear in the results, `id` will match Atorvastatin's ID. Clients will use `id` to request additional drug details.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
