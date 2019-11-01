@@ -1754,6 +1754,8 @@ components:
         subtitle:
           type: string
           nullable: true
+        urlSlug:
+          type: string
     SearchWrapper:
       type: object
       properties:
@@ -1770,16 +1772,19 @@ components:
             type: drug
             title: Atorvastatin
             subtitle: Generic Lipitor
+            urlSlug: atorvastatin
           -
             id: 9bd9b0f5-261a-4b5e-9fd6-394fa54582c7
             type: drug
             title: Lipitor
             subtitle: Atorvastatin
+            urlSlug: lipitor
           -
             id: 9cf9ef80-59d9-446b-b311-2caeaaeff43c
             type: drug
             title: Altoprev
             subtitle: null
+            urlSlug: altoprev
         metadata:
           count: 1
           currentPage: 1
