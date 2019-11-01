@@ -1,0 +1,17 @@
+dist: xenial
+
+before_install:
+  # Install Azure CLI
+  - curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+jobs:
+  include:
+    - stage: merge_pr_to_develop
+      if: branch = develop AND type = push AND commit_message =~ /^Merge pull request #\d+ from .+$/
+      script:
+        - /bin/bash .travis/deploy.sh
+
+notifications:
+  email: false
+services:
+  - docker
