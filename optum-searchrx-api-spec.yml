@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.18.0'
+  version: '0.19.0'
   title: SearchRx REST API
   contact:
     name: Livefront
@@ -1213,6 +1213,7 @@ components:
           type: string
           example: ace-inhibitors
         healthConditions:
+          type: array
           items:
             $ref: '#/components/schemas/DrugClassHealthCondition'
           description: Indicates which health conditions this class of drug is popularly prescribed for.
