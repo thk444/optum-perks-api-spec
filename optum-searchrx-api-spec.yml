@@ -2,9 +2,6 @@ openapi: 3.0.0
 info:
   version: '0.18.0'
   title: SearchRx REST API
-  contact:
-    name: Livefront
-    url: https://livefront.com
   description: >
     REST API specification for SearchRx
 security:
