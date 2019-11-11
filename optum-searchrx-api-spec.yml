@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.20.0'
+  version: '0.21.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -11,6 +11,7 @@ security:
 paths:
   /account:
     post:
+      tags: [MVP]
       description: |
         Creates a new anonymous user account.
       parameters:
@@ -24,6 +25,7 @@ paths:
                 $ref: '#/components/schemas/User'
   /cities:
     get:
+      tags: [MVP]
       description: |
         Returns cities, states, or ZIP Codes that match the query.
 
@@ -43,6 +45,7 @@ paths:
                 $ref: '#/components/schemas/CitiesWrapper'
   /content:
     get:
+      tags: [MVP]
       description: |
         Returns dynamic app content.
       parameters:
@@ -57,10 +60,11 @@ paths:
                 $ref: '#/components/schemas/AppContentWrapper'
   /coupons:
     get:
+      tags: [MVP]
       description: |
         Returns all of the coupons for the specified account ID.
 
-        When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
+        When available, clients should specify their current location via the `location` query parameter.
 
         When there are no results, an empty array will be returned.
       parameters:
@@ -75,6 +79,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CouponsWrapper'
     post:
+      tags: [MVP]
       description: |
         Creates a new coupon for the specified formulation.
 
@@ -98,10 +103,11 @@ paths:
           $ref: '#/components/responses/Error422'
   /coupons/{id}:
     get:
+      tags: [MVP]
       description: |
         Returns details for the coupon with the specified ID for the specified account ID.
 
-        When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
+        When available, clients should specify their current location via the `location` query parameter.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -117,6 +123,7 @@ paths:
         '404':
           $ref: '#/components/responses/Error404'
     delete:
+      tags: [MVP]
       description: |
         Deletes the coupon with the specified ID for the specified account ID.
       parameters:
@@ -129,6 +136,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /coupons/{id}/save:
     post:
+      tags: [MVP]
       description: |
         Saves the coupon with the specified ID to the current user's coupon list.
       parameters:
@@ -148,6 +156,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /coupons/{id}/copy:
     post:
+      tags: [MVP]
       description: |
         Copies an existing coupon for the specified coupon ID and account ID for sharing via a mobile OS share sheet.
       parameters:
@@ -172,6 +181,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /coupons/{id}/send:
     post:
+      tags: [MVP]
       description: |
         Sends a copy of the coupon for the specified coupon ID and account ID to the specified recipient.
 
@@ -198,6 +208,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /devices:
     post:
+      tags: [Post-MVP]
       description: |
         Creates a new device for the current user with the specified properties.
       parameters:
@@ -219,6 +230,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /discount-cards/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns details for the discount card with the specified ID or URL slug.
       parameters:
@@ -236,6 +248,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drugs:
     get:
+      tags: [MVP]
       description: |
         Returns a list of drugs that match the query parameters.
 
@@ -256,6 +269,7 @@ paths:
                 $ref: '#/components/schemas/DrugsWrapper'
   /drugs/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns the drug with the specified ID or URL slug.
       parameters:
@@ -273,6 +287,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drugs/{id-or-urlSlug}/images:
     get:
+      tags: [MVP]
       description: |
         Returns images for the drug with the specified ID or URL slug.
 
@@ -292,6 +307,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drug-classes:
     get:
+      tags: [MVP]
       description: |
         Returns all the drug classes.
       parameters:
@@ -306,6 +322,7 @@ paths:
                 $ref: '#/components/schemas/DrugClassesWrapper'
   /drug-classes/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns the drug class with the specified ID or URL slug.
       parameters:
@@ -323,6 +340,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drug-classes/{id-or-urlSlug}/drugs:
     get:
+      tags: [MVP]
       description: |
         Returns drugs associated with the specified drug class.
       parameters:
@@ -342,6 +360,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions:
     get:
+      tags: [MVP]
       description: |
         Returns all the health conditions.
       parameters:
@@ -357,6 +376,7 @@ paths:
                 $ref: '#/components/schemas/HealthConditionsWrapper'
   /health-conditions/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns the health condition with the specified ID or `urlSlug`.
       parameters:
@@ -374,6 +394,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions/{id-or-urlSlug}/drugs:
     get:
+      tags: [MVP]
       description: |
         Returns drugs associated with the specified health condition.
       parameters:
@@ -393,6 +414,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /kill-switch:
     get:
+      tags: [MVP]
       description: |
         Check to see if a given client is still supported.
       parameters:
@@ -433,6 +455,7 @@ paths:
                 $ref: '#/components/schemas/KillSwitch'
   /preferences:
     get:
+      tags: [Post-MVP]
       description: |
         Returns the current user's preferences.
       parameters:
@@ -446,6 +469,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Preferences'
     patch:
+      tags: [Post-MVP]
       description: |
         Updates the current user's preferences.
       parameters:
@@ -467,6 +491,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /prices:
     get:
+      tags: [MVP]
       description: |
         Returns prices based on the specified formulation and quantity.
 
@@ -487,6 +512,7 @@ paths:
                 $ref: '#/components/schemas/PricesWrapper'
   /retailers:
     get:
+      tags: [MVP]
       description: |
         Returns retailers sorted alphabetically.
       parameters:
@@ -503,6 +529,7 @@ paths:
                 $ref: '#/components/schemas/RetailersWrapper'
   /retailers/{id}/locations:
     get:
+      tags: [MVP]
       description: |
         Returns retailer locations that match the specified search criteria.
 
@@ -537,6 +564,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /search:
     get:
+      tags: [MVP]
       description: |
         Returns a list of search results that match the query parameters.
 
@@ -857,8 +885,6 @@ components:
           example: https://bit.ly/2MUVNgT
         price:
           $ref: '#/components/schemas/Price'
-        nearestLocation:
-          $ref: '#/components/schemas/RetailerLocation'
     CouponCopy:
       type: object
       properties:
@@ -1568,21 +1594,6 @@ components:
             - low
             - medium
             - high
-        priceTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - retail
-              - coupon
-              - searchRx
-            description: |
-              `searchRx` is a placeholder for a future price classification specific to this app.
-        fulfillmentType:
-          type: string
-          enum:
-            - retail
-            - mailOrder
         isLowestPrice:
           type: boolean
         couponId:
@@ -1590,12 +1601,6 @@ components:
           format: uuid
           description: If the current user already has a coupon for this formulation, then this value will reflect the existing coupon's ID.
           nullable: true
-        otherPrices:
-          type: array
-          items:
-            $ref: '#/components/schemas/Price'
-          description: Nested price objects for comparison to this price.
-          example: [] # Note: Swagger doesn't currently allow recursive objects, so leave this [].
     PriceAmount:
       type: object
       properties:
@@ -1640,11 +1645,10 @@ components:
         name:
           type: string
           example: Target
-        isPopular:
-          type: boolean
         isFavorite:
           type: boolean
-          description: Indicates whether or not this retailer has a location in the current user's favorites.
+          description: |
+            [Post-MVP] Indicates whether or not this retailer has a location in the current user's favorites.
         isMembershipRequired:
           type: boolean
         membershipDetailsUrl:
@@ -1673,7 +1677,8 @@ components:
           format: uuid
         isFavorite:
           type: boolean
-          description: Indicates whether or not this location is included in the current user's favorites.
+          description: |
+            [Post-MVP] Indicates whether or not this location is included in the current user's favorites.
         addressLine1:
           type: string
           example: 123 Main St.
@@ -1712,19 +1717,6 @@ components:
           nullable: true
         coordinates:
           $ref: '#/components/schemas/Location'
-        rating:
-          type: object
-          properties:
-            title:
-              type: string
-              example: 4.1 out of 5 Stars
-            description:
-              type: string
-              example: From 52 reviews on Yelp
-            url:
-              type: string
-              example: https://www.yelp.com/biz/target-minneapolis-2
-          nullable: true
     RetailerLocationsWrapper:
       type: object
       properties:
@@ -1811,3 +1803,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error422'
+tags:
+  - name: MVP
+    description: These features are planned for MVP.
+  - name: Post-MVP
+    description: These features are planned for post-MVP.
