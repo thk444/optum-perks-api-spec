@@ -1585,6 +1585,11 @@ components:
             - mailOrder
         isLowestPrice:
           type: boolean
+        couponId:
+          type: string
+          format: uuid
+          description: If the current user already has a coupon for this formulation, then this value will reflect the existing coupon's ID.
+          nullable: true
         otherPrices:
           type: array
           items:
