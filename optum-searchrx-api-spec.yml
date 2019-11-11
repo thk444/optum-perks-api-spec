@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.21.0'
+  version: '0.22.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1460,6 +1460,8 @@ components:
             message:
               type: string
               example: This version is no longer supported. Please update to the latest version.
+          nullable: true
+          description: Information to display to the user in an alert message. This object will be `null` when `isSupported` is true.
         url:
           type: string
           example: https://example.com/new-version-info.html
