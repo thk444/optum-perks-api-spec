@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.22.0'
+  version: '0.23.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -92,6 +92,18 @@ paths:
           'application/json':
             schema:
               $ref: '#/components/schemas/CouponPost'
+            examples:
+              retailer:
+                summary: With a Specific Retailer
+                value:
+                  formulationId: 30d048c3-4a4a-4c96-902b-9b29317893af
+                  quantity: 30
+                  locationId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              universal:
+                summary: Without a Specific Retailer
+                value:
+                  formulationId: 30d048c3-4a4a-4c96-902b-9b29317893af
+                  quantity: 30
       responses:
         '201':
           description: Created
@@ -510,6 +522,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricesWrapper'
+  /prices/universal:
+    get:
+      tags: [MVP]
+      description: |
+        Returns price details unaffiliated with a specific retailer based on the specified formulation and quantity.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/formulationId'
+        - $ref: '#/components/parameters/quantity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricesUniversal'
   /retailers:
     get:
       tags: [MVP]
@@ -883,8 +912,26 @@ components:
         url:
           type: string
           example: https://bit.ly/2MUVNgT
+        formulation:
+          $ref: '#/components/schemas/Formulation'
+        quantity:
+          $ref: '#/components/schemas/Quantity'
         price:
-          $ref: '#/components/schemas/Price'
+          allOf:
+            - $ref: '#/components/schemas/PriceAmount'
+          description: The price for this prescription. This value will only be present for coupons for a specific retailer.
+        retailer:
+          allOf:
+            - $ref: '#/components/schemas/Retailer'
+          description: The retailer for this coupon. This value will only be present for coupons for a specific retailer.
+        priceRange:
+          type: object
+          description: The range of prices for this coupon. This value will only be present for coupons unaffiliated with a specific retailer.
+          properties:
+            lowPrice:
+              $ref: '#/components/schemas/PriceAmount'
+            highPrice:
+              $ref: '#/components/schemas/PriceAmount'
     CouponCopy:
       type: object
       properties:
@@ -933,6 +980,9 @@ components:
           description: This value indicates how the user intends to share the coupon. The server will respond with the full response payload regardless of which `destination` is specified.
     CouponPost:
       type: object
+      required:
+        - formulationId
+        - quantity
       properties:
         formulationId:
           type: string
@@ -944,6 +994,7 @@ components:
         locationId:
           type: string
           format: uuid
+          description: If this value is not present in the request body, then a coupon unaffiliated with a specific retailer will be created.
     CouponSendPost:
       type: object
       properties:
@@ -1626,6 +1677,18 @@ components:
             $ref: '#/components/schemas/Price'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
+    PricesUniversal:
+      type: object
+      properties:
+        lowPrice:
+          $ref: '#/components/schemas/PriceAmount'
+        highPrice:
+          $ref: '#/components/schemas/PriceAmount'
+        couponId:
+          type: string
+          format: uuid
+          description: If the current user already has a universal coupon for this formulation, then this value will reflect the existing coupon's ID.
+          nullable: true
     Quantity:
       type: object
       properties:
