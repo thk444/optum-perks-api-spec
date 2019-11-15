@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.20.0'
+  version: '0.25.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -11,6 +11,7 @@ security:
 paths:
   /account:
     post:
+      tags: [MVP]
       description: |
         Creates a new anonymous user account.
       parameters:
@@ -24,6 +25,7 @@ paths:
                 $ref: '#/components/schemas/User'
   /cities:
     get:
+      tags: [MVP]
       description: |
         Returns cities, states, or ZIP Codes that match the query.
 
@@ -43,6 +45,7 @@ paths:
                 $ref: '#/components/schemas/CitiesWrapper'
   /content:
     get:
+      tags: [MVP]
       description: |
         Returns dynamic app content.
       parameters:
@@ -57,10 +60,11 @@ paths:
                 $ref: '#/components/schemas/AppContentWrapper'
   /coupons:
     get:
+      tags: [MVP]
       description: |
         Returns all of the coupons for the specified account ID.
 
-        When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
+        When available, clients should specify their current location via the `location` query parameter.
 
         When there are no results, an empty array will be returned.
       parameters:
@@ -75,6 +79,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CouponsWrapper'
     post:
+      tags: [MVP]
       description: |
         Creates a new coupon for the specified formulation.
 
@@ -87,6 +92,18 @@ paths:
           'application/json':
             schema:
               $ref: '#/components/schemas/CouponPost'
+            examples:
+              retailer:
+                summary: With a Specific Retailer
+                value:
+                  formulationId: 30d048c3-4a4a-4c96-902b-9b29317893af
+                  quantity: 30
+                  locationId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              universal:
+                summary: Without a Specific Retailer
+                value:
+                  formulationId: 30d048c3-4a4a-4c96-902b-9b29317893af
+                  quantity: 30
       responses:
         '201':
           description: Created
@@ -98,10 +115,11 @@ paths:
           $ref: '#/components/responses/Error422'
   /coupons/{id}:
     get:
+      tags: [MVP]
       description: |
         Returns details for the coupon with the specified ID for the specified account ID.
 
-        When available, clients should specify their current location via the `location` query parameter. Results should include `nearestLocation` relative to the specified location.
+        When available, clients should specify their current location via the `location` query parameter.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -117,6 +135,7 @@ paths:
         '404':
           $ref: '#/components/responses/Error404'
     delete:
+      tags: [MVP]
       description: |
         Deletes the coupon with the specified ID for the specified account ID.
       parameters:
@@ -129,6 +148,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /coupons/{id}/save:
     post:
+      tags: [MVP]
       description: |
         Saves the coupon with the specified ID to the current user's coupon list.
       parameters:
@@ -148,6 +168,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /coupons/{id}/copy:
     post:
+      tags: [MVP]
       description: |
         Copies an existing coupon for the specified coupon ID and account ID for sharing via a mobile OS share sheet.
       parameters:
@@ -172,6 +193,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /coupons/{id}/send:
     post:
+      tags: [MVP]
       description: |
         Sends a copy of the coupon for the specified coupon ID and account ID to the specified recipient.
 
@@ -185,6 +207,17 @@ paths:
           'application/json':
             schema:
               $ref: '#/components/schemas/CouponSendPost'
+            examples:
+              email:
+                summary: Email
+                value:
+                  sendType: email
+                  email: test@example.com
+              textMessage:
+                summary: Text Message
+                value:
+                  sendType: textMessage
+                  phoneNumber: 6121111111
       responses:
         '201':
           description: Created
@@ -198,6 +231,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /devices:
     post:
+      tags: [Post-MVP]
       description: |
         Creates a new device for the current user with the specified properties.
       parameters:
@@ -219,6 +253,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /discount-cards/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns details for the discount card with the specified ID or URL slug.
       parameters:
@@ -236,6 +271,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drugs:
     get:
+      tags: [MVP]
       description: |
         Returns a list of drugs that match the query parameters.
 
@@ -256,6 +292,7 @@ paths:
                 $ref: '#/components/schemas/DrugsWrapper'
   /drugs/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns the drug with the specified ID or URL slug.
       parameters:
@@ -273,6 +310,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drugs/{id-or-urlSlug}/images:
     get:
+      tags: [MVP]
       description: |
         Returns images for the drug with the specified ID or URL slug.
 
@@ -292,6 +330,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drug-classes:
     get:
+      tags: [MVP]
       description: |
         Returns all the drug classes.
       parameters:
@@ -306,6 +345,7 @@ paths:
                 $ref: '#/components/schemas/DrugClassesWrapper'
   /drug-classes/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns the drug class with the specified ID or URL slug.
       parameters:
@@ -323,6 +363,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drug-classes/{id-or-urlSlug}/drugs:
     get:
+      tags: [MVP]
       description: |
         Returns drugs associated with the specified drug class.
       parameters:
@@ -342,6 +383,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions:
     get:
+      tags: [MVP]
       description: |
         Returns all the health conditions.
       parameters:
@@ -357,6 +399,7 @@ paths:
                 $ref: '#/components/schemas/HealthConditionsWrapper'
   /health-conditions/{id-or-urlSlug}:
     get:
+      tags: [MVP]
       description: |
         Returns the health condition with the specified ID or `urlSlug`.
       parameters:
@@ -374,6 +417,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions/{id-or-urlSlug}/drugs:
     get:
+      tags: [MVP]
       description: |
         Returns drugs associated with the specified health condition.
       parameters:
@@ -393,8 +437,9 @@ paths:
           $ref: '#/components/responses/Error404'
   /kill-switch:
     get:
+      tags: [MVP]
       description: |
-        Check to see if a given client is still supported.
+        Checks to see if a given client is still supported.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -433,6 +478,7 @@ paths:
                 $ref: '#/components/schemas/KillSwitch'
   /preferences:
     get:
+      tags: [Post-MVP]
       description: |
         Returns the current user's preferences.
       parameters:
@@ -446,6 +492,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Preferences'
     patch:
+      tags: [Post-MVP]
       description: |
         Updates the current user's preferences.
       parameters:
@@ -467,6 +514,7 @@ paths:
           $ref: '#/components/responses/Error422'
   /prices:
     get:
+      tags: [MVP]
       description: |
         Returns prices based on the specified formulation and quantity.
 
@@ -485,8 +533,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricesWrapper'
+  /prices/universal:
+    get:
+      tags: [MVP]
+      description: |
+        Returns price details unaffiliated with a specific retailer based on the specified formulation and quantity.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/formulationId'
+        - $ref: '#/components/parameters/quantity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricesUniversal'
   /retailers:
     get:
+      tags: [MVP]
       description: |
         Returns retailers sorted alphabetically.
       parameters:
@@ -503,6 +569,7 @@ paths:
                 $ref: '#/components/schemas/RetailersWrapper'
   /retailers/{id}/locations:
     get:
+      tags: [MVP]
       description: |
         Returns retailer locations that match the specified search criteria.
 
@@ -537,6 +604,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /search:
     get:
+      tags: [MVP]
       description: |
         Returns a list of search results that match the query parameters.
 
@@ -778,6 +846,10 @@ components:
   schemas:
     AppContent:
       type: object
+      required:
+        - html
+        - id
+        - title
       properties:
         id:
           type: string
@@ -791,6 +863,9 @@ components:
             <p>This is the content for the Help section.</p>
     AppContentWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -800,6 +875,9 @@ components:
           $ref: '#/components/schemas/PageMetadataNull'
     CitiesWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -809,17 +887,22 @@ components:
           $ref: '#/components/schemas/PageMetadataNull'
     City:
       type: object
+      required:
+        - coordinates
+        - name
       properties:
         name:
           type: string
           example: Minneapolis, MN
-        zip:
-          type: string
-          example: '55401'
         coordinates:
-          $ref: '#/components/schemas/Location'
+          $ref: '#/components/schemas/Coordinates'
     Content:
       type: object
+      required:
+        - html
+        - id
+        - legalDisclaimer
+        - title
       properties:
         id:
           type: string
@@ -834,8 +917,31 @@ components:
         legalDisclaimer:
           type: string
           example: A disclaimer is generally any statement intended to specify or delimit the scope of rights and obligations that may be exercised and enforced by parties in a legally recognized relationship. In contrast to other terms for legally operative language, the term disclaimer usually implies situations that involve some level of uncertainty, waiver, or risk.
+    Coordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 44.949782
+        longitude:
+          type: number
+          format: double
+          example: -93.285233
     Coupon:
       type: object
+      required:
+        - bin
+        - formulation
+        - grp
+        - id
+        - pcn
+        - quantity
+        - uid
+        - url
       properties:
         id:
           type: string
@@ -855,12 +961,33 @@ components:
         url:
           type: string
           example: https://bit.ly/2MUVNgT
+        formulation:
+          $ref: '#/components/schemas/Formulation'
+        quantity:
+          $ref: '#/components/schemas/Quantity'
         price:
-          $ref: '#/components/schemas/Price'
-        nearestLocation:
-          $ref: '#/components/schemas/RetailerLocation'
+          allOf:
+            - $ref: '#/components/schemas/PriceAmount'
+          description: The price for this prescription. This value will only be present for coupons for a specific retailer.
+        retailer:
+          allOf:
+            - $ref: '#/components/schemas/Retailer'
+          description: The retailer for this coupon. This value will only be present for coupons for a specific retailer.
+        priceRange:
+          type: object
+          description: The range of prices for this coupon. This value will only be present for coupons unaffiliated with a specific retailer.
+          properties:
+            lowPrice:
+              $ref: '#/components/schemas/PriceAmount'
+            highPrice:
+              $ref: '#/components/schemas/PriceAmount'
     CouponCopy:
       type: object
+      required:
+        - coupon
+        - emailBody
+        - subjectLine
+        - textBody
       properties:
         textBody:
           type: string
@@ -896,6 +1023,8 @@ components:
           $ref: '#/components/schemas/Coupon'
     CouponCopyPost:
       type: object
+      required:
+        - destination
       properties:
         destination:
           type: string
@@ -907,6 +1036,9 @@ components:
           description: This value indicates how the user intends to share the coupon. The server will respond with the full response payload regardless of which `destination` is specified.
     CouponPost:
       type: object
+      required:
+        - formulationId
+        - quantity
       properties:
         formulationId:
           type: string
@@ -918,8 +1050,11 @@ components:
         locationId:
           type: string
           format: uuid
+          description: If this value is not present in the request body, then a coupon unaffiliated with a specific retailer will be created.
     CouponSendPost:
       type: object
+      required:
+        - sendType
       properties:
         sendType:
           type: string
@@ -930,14 +1065,14 @@ components:
           type: string
           format: email
           description: Required when `sendType` is `email`.
-          nullable: true
         phoneNumber:
           type: string
-          example: null
           description: Required when `sendType` is `textMessage`.
-          nullable: true
     CouponsWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -947,6 +1082,13 @@ components:
           $ref: '#/components/schemas/PageMetadataNull'
     Device:
       type: object
+      required:
+        - appVersion
+        - deviceIdentifier
+        - id
+        - model
+        - osVersion
+        - platform
       properties:
         id:
           type: string
@@ -955,7 +1097,6 @@ components:
           type: string
           format: uuid
           description: Push notification token provided by iOS or Android. This value is not always immediately available, so it's optional. The device may make a second post that includes this value.
-          nullable: true
         deviceIdentifier:
           type: string
           format: uuid
@@ -976,12 +1117,17 @@ components:
           example: '1.4'
     DevicePost:
       type: object
+      required:
+        - appVersion
+        - deviceIdentifier
+        - model
+        - osVersion
+        - platform
       properties:
         deviceToken:
           type: string
           format: uuid
-          description: Push notification token provided by iOS or Android. This value is not always immediately available, so it's optional. The device may make a second post that includes this value. If a record already exists for this device, then the values should be updated.
-          nullable: true
+          description: Push notification token provided by iOS or Android. This value is not always immediately available, so it's optional. The device may make a second post that includes this value. If a record already exists for this device, then the value should be updated.
         deviceIdentifier:
           type: string
           format: uuid
@@ -1002,6 +1148,13 @@ components:
           example: '1.4'
     DiscountCard:
       type: object
+      required:
+        - discountCardImageUrl
+        - id
+        - pageTitle
+        - partnerLogoUrl
+        - partnerName
+        - urlSlug
       properties:
         id:
           type: string
@@ -1024,6 +1177,20 @@ components:
           nullable: true
     Drug:
       type: object
+      required:
+        - brands
+        - defaultFormulation
+        - formulations
+        - id
+        - info
+        - isGeneric
+        - medicare
+        - name
+        - otherNames
+        - pharmacologicClassifications
+        - sideEffects
+        - therapeuticClassifications
+        - urlSlug
       properties:
         id:
           type: string
@@ -1042,6 +1209,9 @@ components:
           type: array
           items:
             type: object
+            required:
+              - name
+              - urlSlug
             properties:
               name:
                 type: string
@@ -1054,6 +1224,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Formulation'
+          minItems: 1
           example:
             -
               id: 30d048c3-4a4a-4c96-902b-9b29317893af
@@ -1127,6 +1298,9 @@ components:
                   ndc: '50090-9932-0'
         defaultFormulation:
           type: object
+          required:
+            - id
+            - quantity
           properties:
             id:
               type: string
@@ -1159,6 +1333,9 @@ components:
           example: atorvastatin
         medicare:
           type: object
+          required:
+            - isCovered
+            - explanation
           properties:
             isCovered:
               type: boolean
@@ -1168,6 +1345,12 @@ components:
               nullable: true
         sideEffects:
           type: object
+          required:
+            - overview
+            - commonSideEffectsOverview
+            - commonSideEffects
+            - rareSideEffectsOverview
+            - rareSideEffects
           properties:
             overview:
               type: string
@@ -1193,6 +1376,13 @@ components:
                 example: dizziness
     DrugClass:
       type: object
+      required:
+        - description
+        - healthConditions
+        - html
+        - id
+        - name
+        - urlSlug
       properties:
         id:
           type: string
@@ -1221,6 +1411,9 @@ components:
           description: Indicates which health conditions this class of drug is popularly prescribed for.
     DrugClassHealthCondition:
       type: object
+      required:
+        - healthCondition
+        - popularity
       properties:
         healthCondition:
           $ref: '#/components/schemas/HealthCondition'
@@ -1231,6 +1424,9 @@ components:
           nullable: true
     DrugClassesWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1238,17 +1434,11 @@ components:
             $ref: '#/components/schemas/DrugClass'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
-    DrugHealthCondition:
-      type: object
-      properties:
-        healthCondition:
-          $ref: '#/components/schemas/HealthCondition'
-        popularity:
-          type: string
-          example: 'Most Popular'
-          description: This value is displayed to the user to indicate popularity.
     DrugsWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1258,17 +1448,24 @@ components:
           $ref: '#/components/schemas/PageMetadata'
     Error404:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string
           example: The resource {resource name} could not be found.
     Error422:
       type: object
+      required:
+        - errors
       properties:
         errors:
           type: array
           items:
             type: object
+            required:
+              - fieldName
+              - message
             properties:
               fieldName:
                 type: string
@@ -1280,6 +1477,9 @@ components:
                 nullable: true
     FavoriteLocationPreference:
       type: object
+      required:
+        - id
+        - retailer
       properties:
         id:
           type: string
@@ -1288,6 +1488,17 @@ components:
           $ref: '#/components/schemas/Retailer'
     Formulation:
       type: object
+      required:
+        - commonQuantities
+        - dosage
+        - drugId
+        - form
+        - gpi14
+        - id
+        - isGeneric
+        - name
+        - otherNames
+        - pluralForm
       properties:
         id:
           type: string
@@ -1297,7 +1508,6 @@ components:
           format: uuid
         gpi14:
           $ref: '#/components/schemas/GPI14'
-          nullable: true
         name:
           type: string
           example: Atorvastatin
@@ -1318,6 +1528,10 @@ components:
           nullable: true
         dosage:
           type: object
+          required:
+            - value
+            - unit
+            - display
           properties:
             value:
               type: number
@@ -1341,6 +1555,16 @@ components:
         https://www.wolterskluwercdi.com/drug-data/gpi/
     HealthCondition:
       type: object
+      required:
+        - commonName
+        - description
+        - heroIconUrl
+        - heroImageUrl
+        - html
+        - id
+        - isCommon
+        - name
+        - urlSlug
       properties:
         id:
           type: string
@@ -1379,6 +1603,9 @@ components:
           example: allergies
     HealthConditionsWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1388,6 +1615,13 @@ components:
           $ref: '#/components/schemas/PageMetadataNull'
     Image:
       type: object
+      required:
+        - appearance
+        - id
+        - imageUrl
+        - imprint
+        - manufacturer
+        - title
       properties:
         id:
           type: string
@@ -1412,6 +1646,9 @@ components:
           nullable: true
     ImagesWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1421,12 +1658,19 @@ components:
           $ref: '#/components/schemas/PageMetadataNull'
     KillSwitch:
       type: object
+      required:
+        - error
+        - isSupported
+        - url
       properties:
         isSupported:
           type: boolean
           example: false
         error:
           type: object
+          required:
+            - message
+            - title
           properties:
             title:
               type: string
@@ -1434,22 +1678,12 @@ components:
             message:
               type: string
               example: This version is no longer supported. Please update to the latest version.
+          description: Information to display to the user in an alert message. This object will be `null` when `isSupported` is true.
         url:
           type: string
           example: https://example.com/new-version-info.html
           description: The user can open this URL to review upgrade details or install the latest version of the app.
           nullable: true
-    Location:
-      type: object
-      properties:
-        latitude:
-          type: number
-          format: double
-          example: 44.949782
-        longitude:
-          type: number
-          format: double
-          example: -93.285233
     NDC:
       type: string
       example: '50090-1254-0'
@@ -1459,6 +1693,10 @@ components:
       nullable: true
     NotificationPreference:
       type: object
+      required:
+        - enabled
+        - id
+        - type
       properties:
         id:
           type: string
@@ -1472,9 +1710,15 @@ components:
           type: boolean
     OperatingHours:
       type: object
+      required:
+        - close
+        - open
       properties:
         open:
           type: object
+          required:
+            - day
+            - time
           properties:
             day:
               type: string
@@ -1485,6 +1729,9 @@ components:
               description: The hour and minute in 24-hour time.
         close:
           type: object
+          required:
+            - day
+            - time
           properties:
             day:
               type: string
@@ -1496,6 +1743,11 @@ components:
       description: Indicates a single opening and closing window for this location.
     PageMetadata:
       type: object
+      required:
+        - count
+        - currentPage
+        - totalCount
+        - totalPages
       properties:
         count:
           type: integer
@@ -1518,6 +1770,9 @@ components:
       example: null
     Preferences:
       type: object
+      required:
+        - favoriteLocations
+        - notifications
       properties:
         favoriteLocations:
           type: array
@@ -1529,11 +1784,16 @@ components:
             $ref: '#/components/schemas/NotificationPreference'
     PreferencesPatch:
       type: object
+      required:
+        - favoriteLocations
+        - notifications
       properties:
         favoriteLocations:
           type: array
           items:
             type: object
+            required:
+              - locationId
             properties:
               locationId:
                 type: string
@@ -1543,6 +1803,9 @@ components:
           type: array
           items:
             type: object
+            required:
+              - enabled
+              - id
             properties:
               id:
                 type: string
@@ -1551,6 +1814,15 @@ components:
                 type: boolean
     Price:
       type: object
+      required:
+        - couponId
+        - formulation
+        - isLowestPrice
+        - originalPrice
+        - price
+        - priceLevel
+        - quantity
+        - retailer
       properties:
         formulation:
           $ref: '#/components/schemas/Formulation'
@@ -1568,31 +1840,19 @@ components:
             - low
             - medium
             - high
-        priceTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - retail
-              - coupon
-              - searchRx
-            description: |
-              `searchRx` is a placeholder for a future price classification specific to this app.
-        fulfillmentType:
-          type: string
-          enum:
-            - retail
-            - mailOrder
         isLowestPrice:
           type: boolean
-        otherPrices:
-          type: array
-          items:
-            $ref: '#/components/schemas/Price'
-          description: Nested price objects for comparison to this price.
-          example: [] # Note: Swagger doesn't currently allow recursive objects, so leave this [].
+        couponId:
+          type: string
+          format: uuid
+          description: If the current user already has a coupon for this formulation, then this value will reflect the existing coupon's ID.
+          nullable: true
     PriceAmount:
       type: object
+      required:
+        - amount
+        - currency
+        - display
       properties:
         amount:
           type: string
@@ -1607,6 +1867,9 @@ components:
           example: "$10.50"
     PricesWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1614,8 +1877,28 @@ components:
             $ref: '#/components/schemas/Price'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
+    PricesUniversal:
+      type: object
+      required:
+        - couponId
+        - highPrice
+        - lowPrice
+      properties:
+        lowPrice:
+          $ref: '#/components/schemas/PriceAmount'
+        highPrice:
+          $ref: '#/components/schemas/PriceAmount'
+        couponId:
+          type: string
+          format: uuid
+          description: If the current user already has a universal coupon for this formulation, then this value will reflect the existing coupon's ID.
+          nullable: true
     Quantity:
       type: object
+      required:
+        - value
+        - display
+        - ndc
       properties:
         value:
           type: number
@@ -1628,6 +1911,14 @@ components:
           $ref: '#/components/schemas/NDC'
     Retailer:
       type: object
+      required:
+        - id
+        - isFavorite
+        - isMembershipRequired
+        - location
+        - logoUrl
+        - membershipDetailsUrl
+        - name
       properties:
         id:
           type: string
@@ -1635,11 +1926,10 @@ components:
         name:
           type: string
           example: Target
-        isPopular:
-          type: boolean
         isFavorite:
           type: boolean
-          description: Indicates whether or not this retailer has a location in the current user's favorites.
+          description: |
+            [Post-MVP] Indicates whether or not this retailer has a location in the current user's favorites.
         isMembershipRequired:
           type: boolean
         membershipDetailsUrl:
@@ -1653,6 +1943,9 @@ components:
           $ref: '#/components/schemas/RetailerLocation'
     RetailersWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1662,13 +1955,27 @@ components:
           $ref: '#/components/schemas/PageMetadata'
     RetailerLocation:
       type: object
+      required:
+        - addressLine1
+        - addressLine2
+        - city
+        - coordinates
+        - hours
+        - id
+        - isFavorite
+        - phoneNumber
+        - state
+        - tzDatabaseName
+        - websiteUrl
+        - zipCode
       properties:
         id:
           type: string
           format: uuid
         isFavorite:
           type: boolean
-          description: Indicates whether or not this location is included in the current user's favorites.
+          description: |
+            [Post-MVP] Indicates whether or not this location is included in the current user's favorites.
         addressLine1:
           type: string
           example: 123 Main St.
@@ -1706,22 +2013,12 @@ components:
           example: (612) 111-1111
           nullable: true
         coordinates:
-          $ref: '#/components/schemas/Location'
-        rating:
-          type: object
-          properties:
-            title:
-              type: string
-              example: 4.1 out of 5 Stars
-            description:
-              type: string
-              example: From 52 reviews on Yelp
-            url:
-              type: string
-              example: https://www.yelp.com/biz/target-minneapolis-2
-          nullable: true
+          $ref: '#/components/schemas/Coordinates'
     RetailerLocationsWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1731,6 +2028,12 @@ components:
           $ref: '#/components/schemas/PageMetadata'
     SearchResult:
       type: object
+      required:
+        - id
+        - subtitle
+        - title
+        - type
+        - urlSlug
       properties:
         id:
           type: string
@@ -1750,6 +2053,9 @@ components:
           type: string
     SearchWrapper:
       type: object
+      required:
+        - data
+        - metadata
       properties:
         data:
           type: array
@@ -1784,6 +2090,8 @@ components:
           totalPages: 1
     User:
       type: object
+      required:
+        - id
       properties:
         id:
           type: string
@@ -1806,3 +2114,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error422'
+tags:
+  - name: MVP
+    description: These features are planned for MVP.
+  - name: Post-MVP
+    description: These features are planned for post-MVP.
