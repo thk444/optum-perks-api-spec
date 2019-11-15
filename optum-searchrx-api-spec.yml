@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.19.0'
+  version: '0.20.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1034,8 +1034,10 @@ components:
         otherNames:
           type: string
           example: Generic Lipitor
-          description: This value will be `null` unless this formulation is generic.
           nullable: true
+        isGeneric:
+          type: boolean
+          description: Indicates whether or not this drug is generic.
         brands:
           type: array
           items:
@@ -1059,6 +1061,7 @@ components:
               gpi14: '39400010100330'
               name: Atorvastatin
               otherNames: Generic Lipitor
+              isGeneric: true
               form: Tablet
               pluralForm: Tablets
               dosage:
@@ -1084,6 +1087,7 @@ components:
               gpi14: '39400010100360'
               name: Atorvastatin
               otherNames: Generic Lipitor
+              isGeneric: true
               form: Tablet
               pluralForm: Tablets
               dosage:
@@ -1109,6 +1113,7 @@ components:
               gpi14: '58200060100105'
               name: Lipitor
               otherNames: null
+              isGeneric: false
               form: Tablet
               pluralForm: Tablets
               dosage:
@@ -1300,8 +1305,10 @@ components:
         otherNames:
           type: string
           example: Generic Lipitor
-          description: This value will be `null` unless this formulation is generic.
           nullable: true
+        isGeneric:
+          type: boolean
+          description: Indicates whether or not this drug is generic.
         form:
           type: string
           example: Tablet
