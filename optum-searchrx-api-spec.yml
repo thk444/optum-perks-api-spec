@@ -1224,6 +1224,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Formulation'
+          minItems: 1
           example:
             -
               id: 30d048c3-4a4a-4c96-902b-9b29317893af
