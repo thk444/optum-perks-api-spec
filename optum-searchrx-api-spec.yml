@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.24.0'
+  version: '0.25.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -207,6 +207,17 @@ paths:
           'application/json':
             schema:
               $ref: '#/components/schemas/CouponSendPost'
+            examples:
+              email:
+                summary: Email
+                value:
+                  sendType: email
+                  email: test@example.com
+              textMessage:
+                summary: Text Message
+                value:
+                  sendType: textMessage
+                  phoneNumber: 6121111111
       responses:
         '201':
           description: Created
@@ -428,7 +439,7 @@ paths:
     get:
       tags: [MVP]
       description: |
-        Check to see if a given client is still supported.
+        Checks to see if a given client is still supported.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -883,11 +894,8 @@ components:
         name:
           type: string
           example: Minneapolis, MN
-        zip:
-          type: string
-          example: '55401'
         coordinates:
-          $ref: '#/components/schemas/Location'
+          $ref: '#/components/schemas/Coordinates'
     Content:
       type: object
       required:
@@ -909,6 +917,20 @@ components:
         legalDisclaimer:
           type: string
           example: A disclaimer is generally any statement intended to specify or delimit the scope of rights and obligations that may be exercised and enforced by parties in a legally recognized relationship. In contrast to other terms for legally operative language, the term disclaimer usually implies situations that involve some level of uncertainty, waiver, or risk.
+    Coordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 44.949782
+        longitude:
+          type: number
+          format: double
+          example: -93.285233
     Coupon:
       type: object
       required:
@@ -1411,15 +1433,6 @@ components:
             $ref: '#/components/schemas/DrugClass'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
-    DrugHealthCondition:
-      type: object
-      properties:
-        healthCondition:
-          $ref: '#/components/schemas/HealthCondition'
-        popularity:
-          type: string
-          example: 'Most Popular'
-          description: This value is displayed to the user to indicate popularity.
     DrugsWrapper:
       type: object
       required:
@@ -1670,17 +1683,6 @@ components:
           example: https://example.com/new-version-info.html
           description: The user can open this URL to review upgrade details or install the latest version of the app.
           nullable: true
-    Location:
-      type: object
-      properties:
-        latitude:
-          type: number
-          format: double
-          example: 44.949782
-        longitude:
-          type: number
-          format: double
-          example: -93.285233
     NDC:
       type: string
       example: '50090-1254-0'
@@ -2010,7 +2012,7 @@ components:
           example: (612) 111-1111
           nullable: true
         coordinates:
-          $ref: '#/components/schemas/Location'
+          $ref: '#/components/schemas/Coordinates'
     RetailerLocationsWrapper:
       type: object
       required:
