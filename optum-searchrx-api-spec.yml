@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.25.0'
+  version: '0.26.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1178,7 +1178,6 @@ components:
     Drug:
       type: object
       required:
-        - brands
         - defaultFormulation
         - formulations
         - id
@@ -1186,11 +1185,11 @@ components:
         - isGeneric
         - medicare
         - name
-        - otherNames
         - pharmacologicClassifications
         - sideEffects
         - therapeuticClassifications
         - urlSlug
+        - variants
       properties:
         id:
           type: string
@@ -1198,28 +1197,13 @@ components:
         name:
           type: string
           example: Atorvastatin
-        otherNames:
-          type: string
-          example: Generic Lipitor
-          nullable: true
         isGeneric:
           type: boolean
           description: Indicates whether or not this drug is generic.
-        brands:
+        variants:
           type: array
           items:
-            type: object
-            required:
-              - name
-              - urlSlug
-            properties:
-              name:
-                type: string
-                example: Lipitor
-              urlSlug:
-                type: string
-                example: lipitor
-                nullable: true
+            $ref: '#/components/schemas/Variant'
         formulations:
           type: array
           items:
@@ -1231,7 +1215,6 @@ components:
               drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '39400010100330'
               name: Atorvastatin
-              otherNames: Generic Lipitor
               isGeneric: true
               form: Tablet
               pluralForm: Tablets
@@ -1257,7 +1240,6 @@ components:
               drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '39400010100360'
               name: Atorvastatin
-              otherNames: Generic Lipitor
               isGeneric: true
               form: Tablet
               pluralForm: Tablets
@@ -1283,7 +1265,6 @@ components:
               drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '58200060100105'
               name: Lipitor
-              otherNames: null
               isGeneric: false
               form: Tablet
               pluralForm: Tablets
@@ -1497,7 +1478,6 @@ components:
         - id
         - isGeneric
         - name
-        - otherNames
         - pluralForm
       properties:
         id:
@@ -1512,10 +1492,6 @@ components:
           type: string
           example: Atorvastatin
           description: The name of the drug. This could be the generic name or a brand name.
-        otherNames:
-          type: string
-          example: Generic Lipitor
-          nullable: true
         isGeneric:
           type: boolean
           description: Indicates whether or not this drug is generic.
@@ -2097,6 +2073,31 @@ components:
           type: string
           format: uuid
           description: A unique identifier for the user. This value should be sent as the `X-Account-ID` header value for subsequent requests.
+    Variant:
+      type: object
+      required:
+        - id
+        - isGeneric
+        - name
+        - urlSlug
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
+        urlSlug:
+          type: string
+          example: lipitor
+          nullable: true
+        name:
+          type: string
+          example: Lipitor
+        isGeneric:
+          type: boolean
+          example: false
+          description: Indicates whether or not this drug is generic.
+      description: |
+        This represents an alternative version of this drug. Variants include both generic and brand names.
   responses:
     Error404:
       description: |
