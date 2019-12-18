@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.27.0'
+  version: '0.28.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -935,6 +935,7 @@ components:
       type: object
       required:
         - bin
+        - drugStatus
         - formulation
         - grp
         - id
@@ -961,6 +962,8 @@ components:
         url:
           type: string
           example: https://bit.ly/2MUVNgT
+        drugStatus:
+          $ref: '#/components/schemas/DrugStatus'
         formulation:
           $ref: '#/components/schemas/Formulation'
         quantity:
@@ -1179,6 +1182,7 @@ components:
       type: object
       required:
         - defaultSettings
+        - drugStatus
         - formulations
         - id
         - info
@@ -1200,6 +1204,8 @@ components:
         isGeneric:
           type: boolean
           description: Indicates whether or not this drug is generic.
+        drugStatus:
+          $ref: '#/components/schemas/DrugStatus'
         variants:
           type: array
           items:
@@ -1415,6 +1421,39 @@ components:
             $ref: '#/components/schemas/DrugClass'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
+    DrugStatus:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - active
+            - notYetAvailable
+            - recalled
+          description: When `type` is `active`, `details` will not be included.
+        details:
+          type: object
+          required:
+            - description
+            - title
+            - moreInfoUrl
+          properties:
+            title:
+              type: string
+              example: Dexlansoprazole is not available yet.
+            description:
+              type: string
+              example: Dexlansoprazole has been approved by the FDA but isn't available in pharmacies yet.
+            moreInfoUrl:
+              type: string
+              example: https://example.com/more-details
+              nullable: true
+          description: This attribute will not be included when type is `active`.
+      example:
+        type: active
+        details: null
     DrugsWrapper:
       type: object
       required:
