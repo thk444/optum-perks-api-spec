@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.28.0'
+  version: '0.29.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -476,6 +476,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KillSwitch'
+  /newsletter-sign-up:
+    post:
+      tags: [MVP]
+      description: |
+        Registers the specified email address to receive the newsletter. The server will validate the email address and return a validation error if the email address is invalid.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/NewsletterSignUpPost'
+      responses:
+        '204':
+          description: No Content
+        '422':
+          description: |
+            Returned when request fails due to an invalid email address.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - fieldName
+                        - message
+                      properties:
+                        fieldName:
+                          type: string
+                          example: 'email'
+                        message:
+                          type: string
+                          example: The email field was invalid.
   /preferences:
     get:
       tags: [Post-MVP]
@@ -634,6 +673,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchWrapper'
+  /send-app-link:
+    post:
+      tags: [MVP]
+      description: |
+        Sends an SMS message to the specified number with a link to download the app.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/SendAppLinkPost'
+      responses:
+        '204':
+          description: No Content
+        '422':
+          description: |
+            Returned when request fails due to an invalid email address.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - fieldName
+                        - message
+                      properties:
+                        fieldName:
+                          type: string
+                          example: 'phoneNumber'
+                        message:
+                          type: string
+                          example: The phone number was invalid.
 components:
   parameters:
     acceptLanguage:
@@ -1706,6 +1784,14 @@ components:
         National Drug Code from the FDA
         https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
       nullable: true
+    NewsletterSignUpPost:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          example: test@example.com
     NotificationPreference:
       type: object
       required:
@@ -2103,6 +2189,14 @@ components:
           currentPage: 1
           totalCount: 3
           totalPages: 1
+    SendAppLinkPost:
+      type: object
+      required:
+        - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
+          example: (612) 111-1111
     User:
       type: object
       required:
