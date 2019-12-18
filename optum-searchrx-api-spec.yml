@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.26.0'
+  version: '0.27.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1178,7 +1178,7 @@ components:
     Drug:
       type: object
       required:
-        - defaultFormulation
+        - defaultSettings
         - formulations
         - id
         - info
@@ -1277,13 +1277,13 @@ components:
                   value: 60
                   display: 60 tablets
                   ndc: '50090-9932-0'
-        defaultFormulation:
+        defaultSettings:
           type: object
           required:
-            - id
+            - formulationId
             - quantity
           properties:
-            id:
+            formulationId:
               type: string
               format: uuid
               example: 30d048c3-4a4a-4c96-902b-9b29317893af
