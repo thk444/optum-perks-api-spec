@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.29.0'
+  version: '0.30.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1242,10 +1242,10 @@ components:
           format: uuid
         pageTitle:
           type: string
-          example: Get your free AARP Discount Card!
+          example: Get your free Genoa Discount Card!
         partnerName:
           type: string
-          example: AARP
+          example: Genoa
         partnerLogoUrl:
           type: string
           example: https://example.com/logo.png
@@ -1254,7 +1254,7 @@ components:
           example: https://example.com/image.png
         urlSlug:
           type: string
-          example: aarp
+          example: genoa
           nullable: true
     Drug:
       type: object
