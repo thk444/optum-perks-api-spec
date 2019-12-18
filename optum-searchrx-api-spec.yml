@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.30.0'
+  version: '0.31.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1230,10 +1230,10 @@ components:
     DiscountCard:
       type: object
       required:
-        - discountCardImageUrl
+        - discountCardImage
         - id
         - pageTitle
-        - partnerLogoUrl
+        - partnerLogo
         - partnerName
         - urlSlug
       properties:
@@ -1246,12 +1246,10 @@ components:
         partnerName:
           type: string
           example: Genoa
-        partnerLogoUrl:
-          type: string
-          example: https://example.com/logo.png
-        discountCardImageUrl:
-          type: string
-          example: https://example.com/image.png
+        partnerLogo:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
+        discountCardImage:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
         urlSlug:
           type: string
           example: genoa
@@ -1651,8 +1649,8 @@ components:
       required:
         - commonName
         - description
-        - heroIconUrl
-        - heroImageUrl
+        - heroIcon
+        - heroImage
         - html
         - id
         - isCommon
@@ -1680,14 +1678,10 @@ components:
           example: >
             <p>A damaging immune response by the body to a substance, especially pollen, fur, a particular food, or dust, to which it has become hypersensitive.</p>
           nullable: true
-        heroImageUrl:
-          type: string
-          example: https://example.com/image.png
-          nullable: true
-        heroIconUrl:
-          type: string
-          example: https://example.com/image.png
-          nullable: true
+        heroImage:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
+        heroIcon:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
         isCommon:
           type: boolean
           description: Indicates whether or not this is a common health condition.
@@ -1737,6 +1731,21 @@ components:
           type: string
           example: Teva Pharmaceuticals USA
           nullable: true
+    ImageWithDarkModeSupport:
+      type: object
+      required:
+        - darkImageUrl
+        - imageUrl
+      properties:
+        imageUrl:
+          type: string
+          example: https://example.com/image.png
+        darkModeImageUrl:
+          type: string
+          example: https://example.com/dark-mode-image.png
+          nullable: true
+      description: |
+        In order to support dark mode in client apps, an image designed to be shown on a dark background should be included.
     ImagesWrapper:
       type: object
       required:
@@ -2037,9 +2046,8 @@ components:
           type: string
           example: https://rcam.target.com/#/
           nullable: true
-        logoUrl:
-          type: string
-          example: https://example.com/logo.png
+        logo:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
         location:
           $ref: '#/components/schemas/RetailerLocation'
     RetailersWrapper:
