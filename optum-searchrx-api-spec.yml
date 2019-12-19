@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.31.0'
+  version: '0.32.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -99,7 +99,7 @@ paths:
                   formulationId: 30d048c3-4a4a-4c96-902b-9b29317893af
                   quantity: 30
                   locationId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-              universal:
+              composite:
                 summary: Without a Specific Retailer
                 value:
                   formulationId: 30d048c3-4a4a-4c96-902b-9b29317893af
@@ -111,6 +111,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Coupon'
+              examples:
+                compositePrice:
+                  $ref: '#/components/examples/CouponWithCompositePrice'
+                retailerPrice:
+                  $ref: '#/components/examples/CouponWithRetailerPrice'
         '422':
           $ref: '#/components/responses/Error422'
   /coupons/{id}:
@@ -132,6 +137,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Coupon'
+              examples:
+                compositePrice:
+                  $ref: '#/components/examples/CouponWithCompositePrice'
+                retailerPrice:
+                  $ref: '#/components/examples/CouponWithRetailerPrice'
         '404':
           $ref: '#/components/responses/Error404'
     delete:
@@ -162,6 +172,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Coupon'
+              examples:
+                compositePrice:
+                  $ref: '#/components/examples/CouponWithCompositePrice'
+                retailerPrice:
+                  $ref: '#/components/examples/CouponWithRetailerPrice'
         '404':
           $ref: '#/components/responses/Error404'
         '422':
@@ -225,6 +240,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Coupon'
+              examples:
+                compositePrice:
+                  $ref: '#/components/examples/CouponWithCompositePrice'
+                retailerPrice:
+                  $ref: '#/components/examples/CouponWithRetailerPrice'
         '404':
           $ref: '#/components/responses/Error404'
         '422':
@@ -572,7 +592,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricesWrapper'
-  /prices/universal:
+  /prices/composite:
     get:
       tags: [MVP]
       description: |
@@ -588,7 +608,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PricesUniversal'
+                $ref: '#/components/schemas/PricesComposite'
   /retailers:
     get:
       tags: [MVP]
@@ -1018,9 +1038,11 @@ components:
         - grp
         - id
         - pcn
+        - price
         - quantity
         - uid
         - url
+        - variants
       properties:
         id:
           type: string
@@ -1042,26 +1064,16 @@ components:
           example: https://bit.ly/2MUVNgT
         drugStatus:
           $ref: '#/components/schemas/DrugStatus'
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variant'
         formulation:
           $ref: '#/components/schemas/Formulation'
         quantity:
           $ref: '#/components/schemas/Quantity'
         price:
-          allOf:
-            - $ref: '#/components/schemas/PriceAmount'
-          description: The price for this prescription. This value will only be present for coupons for a specific retailer.
-        retailer:
-          allOf:
-            - $ref: '#/components/schemas/Retailer'
-          description: The retailer for this coupon. This value will only be present for coupons for a specific retailer.
-        priceRange:
-          type: object
-          description: The range of prices for this coupon. This value will only be present for coupons unaffiliated with a specific retailer.
-          properties:
-            lowPrice:
-              $ref: '#/components/schemas/PriceAmount'
-            highPrice:
-              $ref: '#/components/schemas/PriceAmount'
+          $ref: '#/components/schemas/CouponPrice'
     CouponCopy:
       type: object
       required:
@@ -1132,6 +1144,47 @@ components:
           type: string
           format: uuid
           description: If this value is not present in the request body, then a coupon unaffiliated with a specific retailer will be created.
+    CouponPrice:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - compositePrice
+            - retailerPrice
+          description: |
+            * When `type` is `compositePrice`, `compositePrice` will be included.
+            * When `type` is `retailerPrice`, `retailerPrice` will be included.
+        compositePrice:
+          $ref: '#/components/schemas/CouponPriceComposite'
+        retailerPrice:
+          $ref: '#/components/schemas/CouponPriceRetailer'
+    CouponPriceComposite:
+      type: object
+      required:
+        - lowPrice
+        - highPrice
+      description: The range of prices for this coupon.
+      properties:
+        lowPrice:
+          $ref: '#/components/schemas/PriceAmount'
+        highPrice:
+          $ref: '#/components/schemas/PriceAmount'
+    CouponPriceRetailer:
+      type: object
+      required:
+        - price
+        - priceLevel
+        - retailer
+      properties:
+        price:
+          $ref: '#/components/schemas/PriceAmount'
+        priceLevel:
+          $ref: '#/components/schemas/PriceLevel'
+        retailer:
+          $ref: '#/components/schemas/Retailer'
     CouponSendPost:
       type: object
       required:
@@ -1945,11 +1998,7 @@ components:
         price:
           $ref: '#/components/schemas/PriceAmount'
         priceLevel:
-          type: string
-          enum:
-            - low
-            - medium
-            - high
+          $ref: '#/components/schemas/PriceLevel'
         isLowestPrice:
           type: boolean
         couponId:
@@ -1975,6 +2024,12 @@ components:
         display:
           type: string
           example: "$10.50"
+    PriceLevel:
+      type: string
+      enum:
+        - low
+        - medium
+        - high
     PricesWrapper:
       type: object
       required:
@@ -1987,7 +2042,7 @@ components:
             $ref: '#/components/schemas/Price'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
-    PricesUniversal:
+    PricesComposite:
       type: object
       required:
         - couponId
@@ -2001,7 +2056,7 @@ components:
         couponId:
           type: string
           format: uuid
-          description: If the current user already has a universal coupon for this formulation, then this value will reflect the existing coupon's ID.
+          description: If the current user already has a composite-price coupon for this formulation, then this value will reflect the existing coupon's ID.
           nullable: true
     Quantity:
       type: object
@@ -2256,6 +2311,130 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error422'
+  examples:
+    CouponWithCompositePrice:
+      summary: Coupon (compositePrice)
+      value:
+        id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        bin: 009999
+        grp: ABC123
+        pcn: ABCDEF
+        uid: ABC1234567
+        url: https://bit.ly/2MUVNgT
+        drugStatus:
+          type: active
+          details:
+        variants:
+        - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
+          urlSlug: lipitor
+          name: Lipitor
+          isGeneric: false
+        formulation:
+          id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          gpi14: '39400010100330'
+          name: Atorvastatin
+          isGeneric: true
+          form: Tablet
+          pluralForm: Tablets
+          dosage:
+            value: 40
+            unit: mg
+            display: 40 mg
+          commonQuantities:
+          - value: 30
+            display: 30 tablets
+            ndc: 50090-1254-0
+        quantity:
+          value: 30
+          display: 30 tablets
+          ndc: 50090-1254-0
+        price:
+          type: compositePrice
+          compositePrice:
+            lowPrice:
+              amount: '10.50'
+              currency: USD
+              display: "$10.50"
+            highPrice:
+              amount: '10.50'
+              currency: USD
+              display: "$10.50"
+    CouponWithRetailerPrice:
+      summary: Coupon (retailerPrice)
+      value:
+        id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        bin: 009999
+        grp: ABC123
+        pcn: ABCDEF
+        uid: ABC1234567
+        url: https://bit.ly/2MUVNgT
+        drugStatus:
+          type: active
+          details:
+        variants:
+        - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
+          urlSlug: lipitor
+          name: Lipitor
+          isGeneric: false
+        formulation:
+          id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          gpi14: '39400010100330'
+          name: Atorvastatin
+          isGeneric: true
+          form: Tablet
+          pluralForm: Tablets
+          dosage:
+            value: 40
+            unit: mg
+            display: 40 mg
+          commonQuantities:
+          - value: 30
+            display: 30 tablets
+            ndc: 50090-1254-0
+        quantity:
+          value: 30
+          display: 30 tablets
+          ndc: 50090-1254-0
+        price:
+          type: retailerPrice
+          retailerPrice:
+            price:
+              amount: '10.50'
+              currency: USD
+              display: "$10.50"
+            priceLevel: low
+            retailer:
+              id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              name: Target
+              isFavorite: true
+              isMembershipRequired: true
+              membershipDetailsUrl: https://rcam.target.com/#/
+              logo:
+                imageUrl: https://example.com/image.png
+                darkModeImageUrl: https://example.com/dark-mode-image.png
+              location:
+                id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                isFavorite: true
+                addressLine1: 123 Main St.
+                addressLine2: string
+                city: Minneapolis
+                state: MN
+                zipCode: '55401'
+                tzDatabaseName: America/Chicago
+                hours:
+                - open:
+                    day: Sunday
+                    time: '08:30'
+                  close:
+                    day: Sunday
+                    time: '22:00'
+                websiteUrl: https://target.com
+                phoneNumber: "(612) 111-1111"
+                coordinates:
+                  latitude: 44.949782
+                  longitude: -93.285233
 tags:
   - name: MVP
     description: These features are planned for MVP.
