@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.32.0'
+  version: '0.33.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -23,26 +23,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-  /cities:
-    get:
-      tags: [MVP]
-      description: |
-        Returns cities, states, or ZIP Codes that match the query.
-
-        This endpoint is intended to be used to display results in real time as the user types.
-
-        When there are no results, an empty array will be returned.
-      parameters:
-        - $ref: '#/components/parameters/acceptLanguage'
-        - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/citiesQuery'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CitiesWrapper'
   /content:
     get:
       tags: [MVP]
@@ -535,6 +515,26 @@ paths:
                         message:
                           type: string
                           example: The email field was invalid.
+  /places:
+    get:
+      tags: [MVP]
+      description: |
+        Returns cities, states, or ZIP Codes that match the query.
+
+        This endpoint is intended to be used to display results in real time as the user types.
+
+        When there are no results, an empty array will be returned.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/placesQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacesWrapper'
   /preferences:
     get:
       tags: [Post-MVP]
@@ -748,14 +748,6 @@ components:
         type: string
         format: uuid
       description: The current user's ID, if any.
-    citiesQuery:
-      in: query
-      name: q
-      schema:
-        type: string
-      required: true
-      description: Query to match all or part of a city, state, or ZIP Code.
-      example: minneap
     couponId:
       in: path
       name: id
@@ -868,6 +860,14 @@ components:
         type: integer
       description: Indicates which page of results to load.
       example: 3
+    placesQuery:
+      in: query
+      name: q
+      schema:
+        type: string
+      required: true
+      description: Query to match all or part of a city, state, or ZIP Code.
+      example: minneap
     quantity:
       in: query
       name: quantity
@@ -969,18 +969,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AppContent'
-        metadata:
-          $ref: '#/components/schemas/PageMetadataNull'
-    CitiesWrapper:
-      type: object
-      required:
-        - data
-        - metadata
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/City'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
     City:
@@ -1931,6 +1919,18 @@ components:
     PageMetadataNull:
       type: object
       example: null
+    PlacesWrapper:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/City'
+        metadata:
+          $ref: '#/components/schemas/PageMetadataNull'
     Preferences:
       type: object
       required:
