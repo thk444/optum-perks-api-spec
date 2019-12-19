@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.33.0'
+  version: '0.34.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -438,6 +438,39 @@ paths:
                 $ref: '#/components/schemas/DrugsWrapper'
         '404':
           $ref: '#/components/responses/Error404'
+  /help:
+    get:
+      tags: [MVP]
+      description: |
+        Returns all of the help categories.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelpWrapper'
+  /help/{id-or-urlSlug}:
+    get:
+      tags: [MVP]
+      description: |
+        Returns the help category with the specified ID or `urlSlug`.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/helpId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Help'
+        '404':
+          $ref: '#/components/responses/Error404'
   /kill-switch:
     get:
       tags: [MVP]
@@ -850,6 +883,14 @@ components:
         Filters the results based on the specified value.
           - `common`: Includes the most common health conditions. These are configured by hand on the backend specifically for SEO.
       example: common
+    helpId:
+      in: path
+      name: id-or-urlSlug
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID or `urlSlug` for a given help entry.
     limit:
       in: query
       name: limit
@@ -1735,6 +1776,59 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HealthCondition'
+        metadata:
+          $ref: '#/components/schemas/PageMetadataNull'
+    Help:
+      allOf:
+        - $ref: '#/components/schemas/HelpBase'
+        - type: object
+          required:
+            - entries
+          properties:
+            entries:
+              type: array
+              items:
+                type: object
+                required:
+                  - descriptionHtml
+                  - descriptionPlainText
+                  - title
+                properties:
+                  title:
+                    type: string
+                    example: Do I need to register or pay for SearchRx?
+                  descriptionHtml:
+                    type: string
+                    example: >
+                      <p>No, you can use SearchRx completely free of charge.</p>
+                  descriptionPlainText:
+                    type: string
+                    example: No, you can use SearchRx completely free of charge.
+    HelpBase:
+      type: object
+      required:
+        - icon
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: How to Use
+        icon:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
+    HelpWrapper:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HelpBase'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
     Image:
