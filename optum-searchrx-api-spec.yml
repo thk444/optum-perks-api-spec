@@ -23,7 +23,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-  /content:
+  /content/{id-or-urlSlug}:
     get:
       tags: [MVP]
       description: |
@@ -31,13 +31,14 @@ paths:
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/contentId'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppContentWrapper'
+                $ref: '#/components/schemas/AppContent'
   /coupons:
     get:
       tags: [MVP]
@@ -748,6 +749,14 @@ components:
         type: string
         format: uuid
       description: The current user's ID, if any.
+    contentId:
+      in: path
+      name: id-or-urlSlug
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID or `urlSlug` for a given content entry.
     couponId:
       in: path
       name: id
@@ -947,7 +956,9 @@ components:
       required:
         - html
         - id
+        - plainText
         - title
+        - urlSlug
       properties:
         id:
           type: string
@@ -958,19 +969,13 @@ components:
         html:
           type: string
           example: >
-            <p>This is the content for the Help section.</p>
-    AppContentWrapper:
-      type: object
-      required:
-        - data
-        - metadata
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AppContent'
-        metadata:
-          $ref: '#/components/schemas/PageMetadataNull'
+            <ul><li><a href="https://example.com/contact-us">Contact Us</a></li></ul>
+        plainText:
+          type: string
+          example: Contact Us
+        urlSlug:
+          type: string
+          example: footer-content
     Content:
       type: object
       required:
@@ -1928,7 +1933,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/City'
+            $ref: '#/components/schemas/Place'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
     Preferences:
