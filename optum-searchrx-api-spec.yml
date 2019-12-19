@@ -971,17 +971,6 @@ components:
             $ref: '#/components/schemas/AppContent'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
-    City:
-      type: object
-      required:
-        - coordinates
-        - name
-      properties:
-        name:
-          type: string
-          example: Minneapolis, MN
-        coordinates:
-          $ref: '#/components/schemas/Coordinates'
     Content:
       type: object
       required:
@@ -1919,6 +1908,17 @@ components:
     PageMetadataNull:
       type: object
       example: null
+    Place:
+      type: object
+      required:
+        - coordinates
+        - name
+      properties:
+        name:
+          type: string
+          example: Minneapolis, MN
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
     PlacesWrapper:
       type: object
       required:
