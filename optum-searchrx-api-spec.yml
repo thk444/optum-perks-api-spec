@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.34.0'
+  version: '0.35.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -613,13 +613,15 @@ paths:
       description: |
         Returns prices based on the specified formulation and quantity.
 
-        The 20 results nearest to `searchLocation` will be returned.
+        * When `searchLocation` is specified: the 20 results nearest to `searchLocation` will be returned.
+        * When `locationIds` is specified: prices for the specified `locationIds` will be returned.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/formulationId'
         - $ref: '#/components/parameters/quantity'
         - $ref: '#/components/parameters/searchLocation'
+        - $ref: '#/components/parameters/locationIds'
         - $ref: '#/components/parameters/location'
       responses:
         '200':
@@ -905,6 +907,13 @@ components:
         type: string
       description: The user's current location. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
+    locationIds:
+      in: query
+      name: locationIds
+      schema:
+        type: string
+      description: A comma-separated list of retailer location IDs. Either `searchLocation` or `locationIds` must be specified.
+      example: c824ef47-4200-467b-8f20-87de4332f45a,cc2cc436-7d3c-4aaf-859b-d71a92716eb1,3b9de4cb-129c-4625-b07f-1b5150d515e6
     page:
       in: query
       name: page
@@ -940,10 +949,9 @@ components:
     searchLocation:
       in: query
       name: searchLocation
-      required: true
       schema:
         type: string
-      description: The center of the search area. Format is `[latitude],[longitude]`.
+      description: The center of the search area. Format is `[latitude],[longitude]`. Either `searchLocation` or `locationIds` must be specified.
       example: 44.949782,-93.285233
     searchLocationLocation:
       in: query
