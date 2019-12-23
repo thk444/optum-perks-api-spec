@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.33.0'
+  version: '0.35.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -438,6 +438,39 @@ paths:
                 $ref: '#/components/schemas/DrugsWrapper'
         '404':
           $ref: '#/components/responses/Error404'
+  /help:
+    get:
+      tags: [MVP]
+      description: |
+        Returns all of the help categories.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelpWrapper'
+  /help/{id-or-urlSlug}:
+    get:
+      tags: [MVP]
+      description: |
+        Returns the help category with the specified ID or `urlSlug`.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/helpId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Help'
+        '404':
+          $ref: '#/components/responses/Error404'
   /kill-switch:
     get:
       tags: [MVP]
@@ -580,13 +613,15 @@ paths:
       description: |
         Returns prices based on the specified formulation and quantity.
 
-        The 20 results nearest to `searchLocation` will be returned.
+        * When `searchLocation` is specified: the 20 results nearest to `searchLocation` will be returned.
+        * When `locationIds` is specified: prices for the specified `locationIds` will be returned.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
         - $ref: '#/components/parameters/formulationId'
         - $ref: '#/components/parameters/quantity'
         - $ref: '#/components/parameters/searchLocation'
+        - $ref: '#/components/parameters/locationIds'
         - $ref: '#/components/parameters/location'
       responses:
         '200':
@@ -850,6 +885,14 @@ components:
         Filters the results based on the specified value.
           - `common`: Includes the most common health conditions. These are configured by hand on the backend specifically for SEO.
       example: common
+    helpId:
+      in: path
+      name: id-or-urlSlug
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID or `urlSlug` for a given help entry.
     limit:
       in: query
       name: limit
@@ -864,6 +907,13 @@ components:
         type: string
       description: The user's current location. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
+    locationIds:
+      in: query
+      name: locationIds
+      schema:
+        type: string
+      description: A comma-separated list of retailer location IDs. Either `searchLocation` or `locationIds` must be specified.
+      example: c824ef47-4200-467b-8f20-87de4332f45a,cc2cc436-7d3c-4aaf-859b-d71a92716eb1,3b9de4cb-129c-4625-b07f-1b5150d515e6
     page:
       in: query
       name: page
@@ -899,10 +949,9 @@ components:
     searchLocation:
       in: query
       name: searchLocation
-      required: true
       schema:
         type: string
-      description: The center of the search area. Format is `[latitude],[longitude]`.
+      description: The center of the search area. Format is `[latitude],[longitude]`. Either `searchLocation` or `locationIds` must be specified.
       example: 44.949782,-93.285233
     searchLocationLocation:
       in: query
@@ -1735,6 +1784,59 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HealthCondition'
+        metadata:
+          $ref: '#/components/schemas/PageMetadataNull'
+    Help:
+      allOf:
+        - $ref: '#/components/schemas/HelpBase'
+        - type: object
+          required:
+            - entries
+          properties:
+            entries:
+              type: array
+              items:
+                type: object
+                required:
+                  - descriptionHtml
+                  - descriptionPlainText
+                  - title
+                properties:
+                  title:
+                    type: string
+                    example: Do I need to register or pay for SearchRx?
+                  descriptionHtml:
+                    type: string
+                    example: >
+                      <p>No, you can use SearchRx completely free of charge.</p>
+                  descriptionPlainText:
+                    type: string
+                    example: No, you can use SearchRx completely free of charge.
+    HelpBase:
+      type: object
+      required:
+        - icon
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: How to Use
+        icon:
+          $ref: '#/components/schemas/ImageWithDarkModeSupport'
+    HelpWrapper:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HelpBase'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
     Image:
