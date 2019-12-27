@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.35.0'
+  version: '0.36.0'
   title: SearchRx REST API
   description: >
     REST API specification for SearchRx
@@ -1020,7 +1020,7 @@ components:
         html:
           type: string
           example: >
-            <ul><li><a href="https://example.com/contact-us">Contact Us</a></li></ul>
+            <ul><li><a href='https://example.com/contact-us'>Contact Us</a></li></ul>
         plainText:
           type: string
           example: Contact Us
