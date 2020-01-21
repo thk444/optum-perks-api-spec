@@ -276,7 +276,7 @@ paths:
     get:
       tags: [MVP]
       description: |
-        Returns a list of drugs that match the query parameters.
+        Returns a list of drugs that match the query parameters. If no query is provided, then all browsable drugs will be returned in a paginated list.
 
         When there are no results, an empty array will be returned.
       parameters:
@@ -286,6 +286,7 @@ paths:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/drugsFilter'
         - $ref: '#/components/parameters/drugsSort'
+        - $ref: '#/components/parameters/drugsStartsWith'
       responses:
         '200':
           description: OK
@@ -858,6 +859,15 @@ components:
           - `popularity`: Sorts results by popularity. Most popular first.
           - `-popularity`: Sorts results by popularity. Least popular first.
       example: name
+    drugsStartsWith:
+      in: query
+      name: startsWith
+      schema:
+        type: string
+        example: A
+      required: false
+      description: |
+        Should be a single character, A-Z. Filters drugs based on the first letter of their name. This is used for building dynamic lists of drugs for browsing.
     formulationId:
       in: query
       name: formulationId
@@ -1032,7 +1042,6 @@ components:
       required:
         - html
         - id
-        - legalDisclaimer
         - title
       properties:
         id:
@@ -1045,9 +1054,6 @@ components:
           type: string
           example: >
             <p>This is the content for the Proper Use section.</p>
-        legalDisclaimer:
-          type: string
-          example: A disclaimer is generally any statement intended to specify or delimit the scope of rights and obligations that may be exercised and enforced by parties in a legally recognized relationship. In contrast to other terms for legally operative language, the term disclaimer usually implies situations that involve some level of uncertainty, waiver, or risk.
     Coordinates:
       type: object
       required:
@@ -1349,6 +1355,7 @@ components:
         - id
         - info
         - isGeneric
+        - legalDisclaimer
         - medicare
         - name
         - pharmacologicClassifications
@@ -1363,6 +1370,12 @@ components:
         name:
           type: string
           example: Atorvastatin
+        descriptionHtml:
+          type: string
+          example: <p>This medicine is an HMG-CoA <a href='https://example.com/drug-class/statin'>reductase inhibitor</a> (also known as a "statin") used in combination with...</p>
+        descriptionText:
+          type: string
+          example: This medicine is an HMG-CoA reductase inhibitor (also known as a "statin") used in combination with...
         isGeneric:
           type: boolean
           description: Indicates whether or not this drug is generic.
@@ -1492,6 +1505,9 @@ components:
               type: string
               example: 100% of Medicare Part D and Medicare Advantage plans cover this drug.
               nullable: true
+        legalDisclaimer:
+          type: string
+          example: A disclaimer is generally any statement intended to specify or delimit the scope of rights and obligations that may be exercised and enforced by parties in a legally recognized relationship. In contrast to other terms for legally operative language, the term disclaimer usually implies situations that involve some level of uncertainty, waiver, or risk.
         sideEffects:
           type: object
           required:
