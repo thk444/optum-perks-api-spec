@@ -313,7 +313,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drugs/{id-or-urlSlug}/images:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       description: |
         Returns images for the drug with the specified ID or URL slug.
 
@@ -386,7 +386,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       description: |
         Returns all the health conditions.
       parameters:
@@ -402,7 +402,7 @@ paths:
                 $ref: '#/components/schemas/HealthConditionsWrapper'
   /health-conditions/{id-or-urlSlug}:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       description: |
         Returns the health condition with the specified ID or `urlSlug`.
       parameters:
@@ -420,7 +420,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions/{id-or-urlSlug}/drugs:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       description: |
         Returns drugs associated with the specified health condition.
       parameters:
@@ -1000,7 +1000,10 @@ components:
           - healthCondition
         default: drug
       required: false
-      description: Restricts results to include values of the specified type. If no value is specified, `drug` is used.
+      description: |
+        Restricts results to include values of the specified type. If no value is specified, `drug` is used.
+
+         **Note:** Only `drug`, the default, is supported for MVP.
   schemas:
     AppContent:
       type: object
@@ -1527,7 +1530,6 @@ components:
       type: object
       required:
         - description
-        - healthConditions
         - html
         - id
         - name
@@ -1557,7 +1559,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DrugClassHealthCondition'
-          description: Indicates which health conditions this class of drug is popularly prescribed for.
+          description: |
+            Indicates which health conditions this class of drug is popularly prescribed for.
+
+            **Note:** This attribute is Post-MVP and will not be included for MVP.
     DrugClassHealthCondition:
       type: object
       required:
