@@ -1526,6 +1526,10 @@ components:
           description: Indicates whether or not this drug is generic.
         drugStatus:
           $ref: '#/components/schemas/DrugStatus'
+        drugMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugMessage'
         variants:
           type: array
           items:
@@ -1741,6 +1745,24 @@ components:
             $ref: '#/components/schemas/DrugClass'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
+    DrugMessage:
+      type: object
+      required:
+        - description
+        - title
+        - moreInfoUrl
+      properties:
+        title:
+          type: string
+          example: Specialty Drug
+        description:
+          type: string
+          example: Specialty drugs may need to be filled through specialty pharmacies.
+        moreInfoUrl:
+          type: string
+          example: https://example.com/more-details
+          nullable: true
+      description: A brief message with optional more info link for a drug.
     DrugStatus:
       type: object
       required:
@@ -1752,7 +1774,11 @@ components:
             - active
             - notYetAvailable
             - recalled
-          description: When `type` is `active`, `details` will not be included.
+            - notAvailableThroughPharmacies
+          description: |
+            When `type` is `active`, `details` will not be included.
+
+            Only `active` and `recalled` will be available for MVP.
         details:
           type: object
           required:
