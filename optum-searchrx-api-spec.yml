@@ -1227,7 +1227,6 @@ components:
                 close:
                   day: Sunday
                   time: '22:00'
-              websiteUrl: https://target.com
               phoneNumber: "(612) 111-1111"
               coordinates:
                 latitude: 44.949782
