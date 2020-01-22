@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.36.0'
+  version: '0.37.0'
   title: SearchRx REST API
   description: |
     This API provides content for the SearchRx client apps, allows users to search for drugs, view drug info, and save, print, and share coupons.
