@@ -299,26 +299,60 @@ paths:
                 $ref: '#/components/schemas/Device'
         '422':
           $ref: '#/components/responses/Error422'
-  /discount-cards/{id-or-urlSlug}:
-    get:
+  /discount-cards/{partnerId-or-urlSlug}:
+    post:
       tags: [MVP]
       security:
         - clientOAuth: []
       description: |
-        Returns details for the discount card with the specified ID or URL slug.
+        Creates a new discount card for the specified partner ID or slug and returns the details.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/discountCardId'
+        - $ref: '#/components/parameters/discountCardPartnerId'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscountCard'
         '404':
           $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
+  /discount-cards/{partnerId-or-urlSlug}/send:
+    post:
+      tags: [MVP]
+      description: |
+        Sends the discount card for the specified ID to the specified recipient.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/discountCardPartnerId'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/DiscountCardSendPost'
+            examples:
+              email:
+                summary: Email
+                value:
+                  sendType: email
+                  email: test@example.com
+              textMessage:
+                summary: Text Message
+                value:
+                  sendType: textMessage
+                  phoneNumber: 6121111111
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
   /drugs:
     get:
       tags: [MVP]
@@ -887,14 +921,14 @@ components:
         type: string
         format: uuid
       description: The ID for a given coupon.
-    discountCardId:
+    discountCardPartnerId:
       in: path
-      name: id-or-urlSlug
+      name: partnerId-or-urlSlug
       required: true
       schema:
         type: string
         format: uuid
-      description: The ID or `urlSlug` for a given discount card.
+      description: The partner ID or `urlSlug` for a given discount card. e.g. `genoa`.
     drugClassId:
       in: path
       name: id-or-urlSlug
@@ -1401,30 +1435,44 @@ components:
     DiscountCard:
       type: object
       required:
-        - discountCardImage
+        - authorizationNumber
+        - bin
+        - grp
         - id
-        - pageTitle
-        - partnerLogo
-        - partnerName
-        - urlSlug
+        - pcn
       properties:
         id:
           type: string
           format: uuid
-        pageTitle:
+        authorizationNumber:
           type: string
-          example: Get your free Genoa Discount Card!
-        partnerName:
+          example: BB1002000
+        bin:
           type: string
-          example: Genoa
-        partnerLogo:
-          $ref: '#/components/schemas/ImageWithDarkModeSupport'
-        discountCardImage:
-          $ref: '#/components/schemas/ImageWithDarkModeSupport'
-        urlSlug:
+          example: '005947'
+        grp:
           type: string
-          example: genoa
-          nullable: true
+          example: '8605ZXC'
+        pcn:
+          type: string
+          example: CLAIMCR
+    DiscountCardSendPost:
+      type: object
+      required:
+        - sendType
+      properties:
+        sendType:
+          type: string
+          enum:
+            - email
+            - textMessage
+        email:
+          type: string
+          format: email
+          description: Required when `sendType` is `email`.
+        phoneNumber:
+          type: string
+          description: Required when `sendType` is `textMessage`.
     Drug:
       type: object
       required:
