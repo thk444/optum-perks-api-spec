@@ -57,6 +57,20 @@ paths:
         - clientOAuth: []
       description: |
         Returns dynamic app content.
+
+        * Each content entry includes attributes specifically designed for that content
+        * Content is broken down into components
+        * Each component has a well-defined JSON document in the `attributes` attribute
+        * Attributes are almost always plaintext delivered in key/value pairs, akin to Localization
+        * Attributes are sometimes image URLs
+        * Attributes are sometimes a small amount of HTML (limited subset allowed)
+        * Only a subset of HTML is allowed:
+            * `<h>`
+            * `<p>`
+            * `<ul>`, `<ol>`, `<li>`
+            * `<strong>`, `<em>`
+            * `<a>`
+        * CSS is not allowed
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -535,39 +549,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DrugsWrapper'
-        '404':
-          $ref: '#/components/responses/Error404'
-  /help:
-    get:
-      tags: [MVP]
-      description: |
-        Returns all of the help categories.
-      parameters:
-        - $ref: '#/components/parameters/acceptLanguage'
-        - $ref: '#/components/parameters/accountId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HelpWrapper'
-  /help/{id-or-urlSlug}:
-    get:
-      tags: [MVP]
-      description: |
-        Returns the help category with the specified ID or `urlSlug`.
-      parameters:
-        - $ref: '#/components/parameters/acceptLanguage'
-        - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/helpId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Help'
         '404':
           $ref: '#/components/responses/Error404'
   /kill-switch:
@@ -1124,9 +1105,8 @@ components:
     AppContent:
       type: object
       required:
-        - html
+        - attributes
         - id
-        - plainText
         - title
         - urlSlug
       properties:
@@ -1135,17 +1115,25 @@ components:
           format: uuid
         title:
           type: string
-          example: Help
-        html:
-          type: string
-          example: >
-            <ul><li><a href='https://example.com/contact-us'>Contact Us</a></li></ul>
-        plainText:
-          type: string
-          example: Contact Us
+          example: Genoa-branded Discount Card
         urlSlug:
           type: string
-          example: footer-content
+          example: discount-card-genoa
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          description:
+            A well-defined payload specific to this content entry. This property will always be present, but the attributes is contains will vary based on the content being displayed. The example shown contains the key-value pairs necessary to render the Genoa-branded discount card on the web site.
+          example:
+            title: Get your free Genoa Discount Card!
+            description: Use this card to get discounts on most prescriptions at over 70,000 pharmacies nationwide.
+            cardLogoUrl: https://example.com/image.png
+            cardLogoAltText: Genoa Logo
+            cardHelperText: Use this card through Optum Perks to get discounts on most prescriptions at over 70,000 pharmacies nationwide. Each time you fill a prescription, simply show your discount card to your pharmacist.
+            cardPrimaryAccentColor: '#440f0b'
+            cardSecondaryAccentColor: '#92302a'
+            cardLabel: Pharmacy Discount Card
     Content:
       type: object
       required:
