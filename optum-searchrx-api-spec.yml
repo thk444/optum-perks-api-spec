@@ -867,7 +867,7 @@ components:
         example: A
       required: false
       description: |
-        Should be a single character, A-Z. Filters drugs based on the first letter of their name. This is used for building dynamic lists of drugs for browsing.
+        Should be a single character, 0-9 or A-Z. Filters drugs based on the first letter of their name. This is used for building dynamic lists of drugs for browsing.
     formulationId:
       in: query
       name: formulationId
@@ -1351,14 +1351,13 @@ components:
       required:
         - defaultSettings
         - drugStatus
+        - drugType
         - formulations
         - id
         - info
-        - isGeneric
         - legalDisclaimer
         - medicare
         - name
-        - pharmacologicClassifications
         - sideEffects
         - therapeuticClassifications
         - urlSlug
@@ -1376,9 +1375,8 @@ components:
         descriptionText:
           type: string
           example: This medicine is an HMG-CoA reductase inhibitor (also known as a "statin") used in combination with...
-        isGeneric:
-          type: boolean
-          description: Indicates whether or not this drug is generic.
+        drugType:
+          $ref: '#/components/schemas/DrugType'
         drugStatus:
           $ref: '#/components/schemas/DrugStatus'
         variants:
@@ -1396,7 +1394,7 @@ components:
               drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '39400010100330'
               name: Atorvastatin
-              isGeneric: true
+              drugType: generic
               form: Tablet
               pluralForm: Tablets
               dosage:
@@ -1421,7 +1419,7 @@ components:
               drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '39400010100360'
               name: Atorvastatin
-              isGeneric: true
+              drugType: generic
               form: Tablet
               pluralForm: Tablets
               dosage:
@@ -1446,7 +1444,7 @@ components:
               drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
               gpi14: '58200060100105'
               name: Lipitor
-              isGeneric: false
+              drugType: brand
               form: Tablet
               pluralForm: Tablets
               dosage:
@@ -1484,12 +1482,6 @@ components:
             type: string
           example: [Antihyperlipidemic]
           description: A list of this drug's therapeutic classifications. If there are none, an empty array will be returned.
-        pharmacologicClassifications:
-          type: array
-          items:
-            type: string
-          example: [HMG-COA Reductase Inhibitor]
-          description: A list of this drug's pharmacologic classifications. If there are none, an empty array will be returned.
         urlSlug:
           type: string
           example: atorvastatin
@@ -1632,6 +1624,12 @@ components:
       example:
         type: active
         details: null
+    DrugType:
+      type: string
+      enum:
+        - brand
+        - generic
+      example: generic
     DrugsWrapper:
       type: object
       required:
@@ -1690,10 +1688,11 @@ components:
         - commonQuantities
         - dosage
         - drugId
+        - drugType
+        - drugUrlSlug
         - form
         - gpi14
         - id
-        - isGeneric
         - name
         - pluralForm
       properties:
@@ -1703,15 +1702,17 @@ components:
         drugId:
           type: string
           format: uuid
+        drugUrlSlug:
+          type: string
+          example: atorvastatin
         gpi14:
           $ref: '#/components/schemas/GPI14'
         name:
           type: string
           example: Atorvastatin
           description: The name of the drug. This could be the generic name or a brand name.
-        isGeneric:
-          type: boolean
-          description: Indicates whether or not this drug is generic.
+        drugType:
+          $ref: '#/components/schemas/DrugType'
         form:
           type: string
           example: Tablet
@@ -2397,8 +2398,8 @@ components:
     Variant:
       type: object
       required:
+        - drugType
         - id
-        - isGeneric
         - name
         - urlSlug
       properties:
@@ -2413,10 +2414,8 @@ components:
         name:
           type: string
           example: Lipitor
-        isGeneric:
-          type: boolean
-          example: false
-          description: Indicates whether or not this drug is generic.
+        drugType:
+          $ref: '#/components/schemas/DrugType'
       description: |
         This represents an alternative version of this drug. Variants include both generic and brand names.
   responses:
@@ -2453,13 +2452,13 @@ components:
         - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
           urlSlug: lipitor
           name: Lipitor
-          isGeneric: false
+          drugType: brand
         formulation:
           id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
           drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
           gpi14: '39400010100330'
           name: Atorvastatin
-          isGeneric: true
+          drugType: generic
           form: Tablet
           pluralForm: Tablets
           dosage:
@@ -2501,13 +2500,13 @@ components:
         - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
           urlSlug: lipitor
           name: Lipitor
-          isGeneric: false
+          drugType: brand
         formulation:
           id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
           drugId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
           gpi14: '39400010100330'
           name: Atorvastatin
-          isGeneric: true
+          drugType: generic
           form: Tablet
           pluralForm: Tablets
           dosage:
