@@ -1301,6 +1301,43 @@ components:
           $ref: '#/components/schemas/CouponPriceComposite'
         retailerPrice:
           $ref: '#/components/schemas/CouponPriceRetailer'
+      example:
+        type: retailerPrice
+        retailerPrice:
+          price:
+            amount: '10.50'
+            currency: USD
+            display: "$10.50"
+          priceLevel: low
+          retailer:
+            id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+            name: Target
+            isFavorite: true
+            isMembershipRequired: true
+            membershipDetailsUrl: https://rcam.target.com/#/
+            logo:
+              imageUrl: https://example.com/image.png
+              darkModeImageUrl: https://example.com/dark-mode-image.png
+            location:
+              id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              isFavorite: true
+              addressLine1: 123 Main St.
+              addressLine2: string
+              city: Minneapolis
+              state: MN
+              zipCode: '55401'
+              tzDatabaseName: America/Chicago
+              hours:
+              - open:
+                  day: Sunday
+                  time: '08:30'
+                close:
+                  day: Sunday
+                  time: '22:00'
+              phoneNumber: "(612) 111-1111"
+              coordinates:
+                latitude: 44.949782
+                longitude: -93.285233
     CouponPriceComposite:
       type: object
       required:
@@ -1736,7 +1773,6 @@ components:
           description: This attribute will not be included when type is `active`.
       example:
         type: active
-        details: null
     DrugsWrapper:
       type: object
       required:
@@ -2553,7 +2589,6 @@ components:
         url: https://bit.ly/2MUVNgT
         drugStatus:
           type: active
-          details:
         variants:
         - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
           urlSlug: lipitor
@@ -2601,7 +2636,6 @@ components:
         url: https://bit.ly/2MUVNgT
         drugStatus:
           type: active
-          details:
         variants:
         - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
           urlSlug: lipitor
