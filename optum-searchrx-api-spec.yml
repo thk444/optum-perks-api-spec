@@ -1616,8 +1616,11 @@ components:
             - active
             - notYetAvailable
             - recalled
-            - notAvailableAtPharmacy
-          description: When `type` is `active`, `details` will not be included.
+            - notAvailableThroughPharmacies
+          description: |
+            When `type` is `active`, `details` will not be included.
+
+            Only `active` and `recalled` will be available for MVP.
         details:
           type: object
           required:
