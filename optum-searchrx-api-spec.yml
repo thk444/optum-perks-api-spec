@@ -2,8 +2,33 @@ openapi: 3.0.0
 info:
   version: '0.36.0'
   title: SearchRx REST API
-  description: >
-    REST API specification for SearchRx
+  description: |
+    This API provides content for the SearchRx client apps, allows users to search for drugs, view drug info, and save, print, and share coupons.
+
+    ## Authentication
+
+    API endpoints except for `GET /kill-switch` are secured via OAuth client credentials. Each API client must use a unique client ID and secret to request an access token. Every subsequent request requires a valid access token.
+
+    ## API Versions
+
+    The major version for the API is present in the URL path. e.g. `https://example.com/v1/drugs`.
+
+    ## Backwards Compatibility
+
+    The API spec follows semantic versioning.
+
+    We won't introduce backwards-incompatible changes to a major version of the API. If backwards-incompatible changes are necessary to support new features, then a **new major version** of the API will be introduced. When a new major version is introduced, both the new version and the prior version will be supported simultaneously. Prior versions of the API will eventually be deprecated and removed.
+
+    Backwards-**compatible** changes include:
+
+    * Adding a new attribute to an existing object.
+    * Adding a new API path.
+
+    Backwards-**incompatible** changes include:
+
+    * Changing or removing an existing path name.
+    * Changing or removing an existing object name.
+    * Changing or removing an existing attribute name.
 security:
   - application:
       - read
@@ -12,6 +37,8 @@ paths:
   /account:
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Creates a new anonymous user account.
       parameters:
@@ -26,8 +53,24 @@ paths:
   /content/{id-or-urlSlug}:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns dynamic app content.
+
+        * Each content entry includes attributes specifically designed for that content
+        * Content is broken down into components
+        * Each component has a well-defined JSON document in the `attributes` attribute
+        * Attributes are almost always plaintext delivered in key/value pairs, akin to Localization
+        * Attributes are sometimes image URLs
+        * Attributes are sometimes a small amount of HTML (limited subset allowed)
+        * Only a subset of HTML is allowed:
+            * `<h>`
+            * `<p>`
+            * `<ul>`, `<ol>`, `<li>`
+            * `<strong>`, `<em>`
+            * `<a>`
+        * CSS is not allowed
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
@@ -44,6 +87,8 @@ paths:
   /coupons:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns all of the coupons for the specified account ID.
 
@@ -63,6 +108,8 @@ paths:
                 $ref: '#/components/schemas/CouponsWrapper'
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Creates a new coupon for the specified formulation.
 
@@ -104,6 +151,8 @@ paths:
   /coupons/{id}:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns details for the coupon with the specified ID for the specified account ID.
 
@@ -129,6 +178,8 @@ paths:
           $ref: '#/components/responses/Error404'
     delete:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Deletes the coupon with the specified ID for the specified account ID.
       parameters:
@@ -142,6 +193,8 @@ paths:
   /coupons/{id}/save:
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Saves the coupon with the specified ID to the current user's coupon list.
       parameters:
@@ -167,6 +220,8 @@ paths:
   /coupons/{id}/copy:
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Copies an existing coupon for the specified coupon ID and account ID for sharing via a mobile OS share sheet.
       parameters:
@@ -192,6 +247,8 @@ paths:
   /coupons/{id}/send:
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Sends a copy of the coupon for the specified coupon ID and account ID to the specified recipient.
 
@@ -235,6 +292,8 @@ paths:
   /devices:
     post:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Creates a new device for the current user with the specified properties.
       parameters:
@@ -254,27 +313,65 @@ paths:
                 $ref: '#/components/schemas/Device'
         '422':
           $ref: '#/components/responses/Error422'
-  /discount-cards/{id-or-urlSlug}:
-    get:
+  /discount-cards/{partnerId-or-urlSlug}:
+    post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
-        Returns details for the discount card with the specified ID or URL slug.
+        Creates a new discount card for the specified partner ID or slug and returns the details.
       parameters:
         - $ref: '#/components/parameters/acceptLanguage'
         - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/discountCardId'
+        - $ref: '#/components/parameters/discountCardPartnerId'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscountCard'
         '404':
           $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
+  /discount-cards/{partnerId-or-urlSlug}/send:
+    post:
+      tags: [MVP]
+      description: |
+        Sends the discount card for the specified ID to the specified recipient.
+      parameters:
+        - $ref: '#/components/parameters/acceptLanguage'
+        - $ref: '#/components/parameters/accountId'
+        - $ref: '#/components/parameters/discountCardPartnerId'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/DiscountCardSendPost'
+            examples:
+              email:
+                summary: Email
+                value:
+                  sendType: email
+                  email: test@example.com
+              textMessage:
+                summary: Text Message
+                value:
+                  sendType: textMessage
+                  phoneNumber: 6121111111
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
   /drugs:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns a list of drugs that match the query parameters.
 
@@ -296,6 +393,8 @@ paths:
   /drugs/{id-or-urlSlug}:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns the drug with the specified ID or URL slug.
       parameters:
@@ -314,6 +413,8 @@ paths:
   /drugs/{id-or-urlSlug}/images:
     get:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns images for the drug with the specified ID or URL slug.
 
@@ -334,6 +435,8 @@ paths:
   /drug-classes:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns all the drug classes.
       parameters:
@@ -349,6 +452,8 @@ paths:
   /drug-classes/{id-or-urlSlug}:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns the drug class with the specified ID or URL slug.
       parameters:
@@ -367,6 +472,8 @@ paths:
   /drug-classes/{id-or-urlSlug}/drugs:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns drugs associated with the specified drug class.
       parameters:
@@ -387,6 +494,8 @@ paths:
   /health-conditions:
     get:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns all the health conditions.
       parameters:
@@ -403,6 +512,8 @@ paths:
   /health-conditions/{id-or-urlSlug}:
     get:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns the health condition with the specified ID or `urlSlug`.
       parameters:
@@ -421,6 +532,8 @@ paths:
   /health-conditions/{id-or-urlSlug}/drugs:
     get:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns drugs associated with the specified health condition.
       parameters:
@@ -436,39 +549,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DrugsWrapper'
-        '404':
-          $ref: '#/components/responses/Error404'
-  /help:
-    get:
-      tags: [MVP]
-      description: |
-        Returns all of the help categories.
-      parameters:
-        - $ref: '#/components/parameters/acceptLanguage'
-        - $ref: '#/components/parameters/accountId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HelpWrapper'
-  /help/{id-or-urlSlug}:
-    get:
-      tags: [MVP]
-      description: |
-        Returns the help category with the specified ID or `urlSlug`.
-      parameters:
-        - $ref: '#/components/parameters/acceptLanguage'
-        - $ref: '#/components/parameters/accountId'
-        - $ref: '#/components/parameters/helpId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Help'
         '404':
           $ref: '#/components/responses/Error404'
   /kill-switch:
@@ -515,6 +595,8 @@ paths:
   /newsletter-sign-up:
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Registers the specified email address to receive the newsletter. The server will validate the email address and return a validation error if the email address is invalid.
       parameters:
@@ -554,6 +636,8 @@ paths:
   /places:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns cities, states, or ZIP Codes that match the query.
 
@@ -574,6 +658,8 @@ paths:
   /preferences:
     get:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns the current user's preferences.
       parameters:
@@ -588,6 +674,8 @@ paths:
                 $ref: '#/components/schemas/Preferences'
     patch:
       tags: [Post-MVP]
+      security:
+        - clientOAuth: []
       description: |
         Updates the current user's preferences.
       parameters:
@@ -610,6 +698,8 @@ paths:
   /prices:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns prices based on the specified formulation and quantity.
 
@@ -633,6 +723,8 @@ paths:
   /prices/composite:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns price details unaffiliated with a specific retailer based on the specified formulation and quantity.
       parameters:
@@ -650,6 +742,8 @@ paths:
   /retailers:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns retailers sorted alphabetically.
       parameters:
@@ -667,6 +761,8 @@ paths:
   /retailers/{id}/locations:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns retailer locations that match the specified search criteria.
 
@@ -702,6 +798,8 @@ paths:
   /search:
     get:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Returns a list of search results that match the query parameters.
 
@@ -734,6 +832,8 @@ paths:
   /send-app-link:
     post:
       tags: [MVP]
+      security:
+        - clientOAuth: []
       description: |
         Sends an SMS message to the specified number with a link to download the app.
       parameters:
@@ -802,14 +902,14 @@ components:
         type: string
         format: uuid
       description: The ID for a given coupon.
-    discountCardId:
+    discountCardPartnerId:
       in: path
-      name: id-or-urlSlug
+      name: partnerId-or-urlSlug
       required: true
       schema:
         type: string
         format: uuid
-      description: The ID or `urlSlug` for a given discount card.
+      description: The partner ID or `urlSlug` for a given discount card. e.g. `genoa`.
     drugClassId:
       in: path
       name: id-or-urlSlug
@@ -1008,9 +1108,8 @@ components:
     AppContent:
       type: object
       required:
-        - html
+        - attributes
         - id
-        - plainText
         - title
         - urlSlug
       properties:
@@ -1019,17 +1118,25 @@ components:
           format: uuid
         title:
           type: string
-          example: Help
-        html:
-          type: string
-          example: >
-            <ul><li><a href='https://example.com/contact-us'>Contact Us</a></li></ul>
-        plainText:
-          type: string
-          example: Contact Us
+          example: Genoa-branded Discount Card
         urlSlug:
           type: string
-          example: footer-content
+          example: discount-card-genoa
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          description:
+            A well-defined payload specific to this content entry. This property will always be present, but the attributes is contains will vary based on the content being displayed. The example shown contains the key-value pairs necessary to render the Genoa-branded discount card on the web site.
+          example:
+            title: Get your free Genoa Discount Card!
+            description: Use this card to get discounts on most prescriptions at over 70,000 pharmacies nationwide.
+            cardLogoUrl: https://example.com/image.png
+            cardLogoAltText: Genoa Logo
+            cardHelperText: Use this card through Optum Perks to get discounts on most prescriptions at over 70,000 pharmacies nationwide. Each time you fill a prescription, simply show your discount card to your pharmacist.
+            cardPrimaryAccentColor: '#440f0b'
+            cardSecondaryAccentColor: '#92302a'
+            cardLabel: Pharmacy Discount Card
     Content:
       type: object
       required:
@@ -1197,6 +1304,43 @@ components:
           $ref: '#/components/schemas/CouponPriceComposite'
         retailerPrice:
           $ref: '#/components/schemas/CouponPriceRetailer'
+      example:
+        type: retailerPrice
+        retailerPrice:
+          price:
+            amount: '10.50'
+            currency: USD
+            display: "$10.50"
+          priceLevel: low
+          retailer:
+            id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+            name: Target
+            isFavorite: true
+            isMembershipRequired: true
+            membershipDetailsUrl: https://rcam.target.com/#/
+            logo:
+              imageUrl: https://example.com/image.png
+              darkModeImageUrl: https://example.com/dark-mode-image.png
+            location:
+              id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              isFavorite: true
+              addressLine1: 123 Main St.
+              addressLine2: string
+              city: Minneapolis
+              state: MN
+              zipCode: '55401'
+              tzDatabaseName: America/Chicago
+              hours:
+              - open:
+                  day: Sunday
+                  time: '08:30'
+                close:
+                  day: Sunday
+                  time: '22:00'
+              phoneNumber: "(612) 111-1111"
+              coordinates:
+                latitude: 44.949782
+                longitude: -93.285233
     CouponPriceComposite:
       type: object
       required:
@@ -1319,30 +1463,44 @@ components:
     DiscountCard:
       type: object
       required:
-        - discountCardImage
+        - authorizationNumber
+        - bin
+        - grp
         - id
-        - pageTitle
-        - partnerLogo
-        - partnerName
-        - urlSlug
+        - pcn
       properties:
         id:
           type: string
           format: uuid
-        pageTitle:
+        authorizationNumber:
           type: string
-          example: Get your free Genoa Discount Card!
-        partnerName:
+          example: BB1002000
+        bin:
           type: string
-          example: Genoa
-        partnerLogo:
-          $ref: '#/components/schemas/ImageWithDarkModeSupport'
-        discountCardImage:
-          $ref: '#/components/schemas/ImageWithDarkModeSupport'
-        urlSlug:
+          example: '005947'
+        grp:
           type: string
-          example: genoa
-          nullable: true
+          example: '8605ZXC'
+        pcn:
+          type: string
+          example: CLAIMCR
+    DiscountCardSendPost:
+      type: object
+      required:
+        - sendType
+      properties:
+        sendType:
+          type: string
+          enum:
+            - email
+            - textMessage
+        email:
+          type: string
+          format: email
+          description: Required when `sendType` is `email`.
+        phoneNumber:
+          type: string
+          description: Required when `sendType` is `textMessage`.
     Drug:
       type: object
       required:
@@ -1371,6 +1529,10 @@ components:
           description: Indicates whether or not this drug is generic.
         drugStatus:
           $ref: '#/components/schemas/DrugStatus'
+        drugMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugMessage'
         variants:
           type: array
           items:
@@ -1588,6 +1750,24 @@ components:
             $ref: '#/components/schemas/DrugClass'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
+    DrugMessage:
+      type: object
+      required:
+        - description
+        - title
+        - moreInfoUrl
+      properties:
+        title:
+          type: string
+          example: Specialty Drug
+        description:
+          type: string
+          example: Specialty drugs may need to be filled through specialty pharmacies.
+        moreInfoUrl:
+          type: string
+          example: https://example.com/more-details
+          nullable: true
+      description: A brief message with optional more info link for a drug.
     DrugStatus:
       type: object
       required:
@@ -1599,7 +1779,11 @@ components:
             - active
             - notYetAvailable
             - recalled
-          description: When `type` is `active`, `details` will not be included.
+            - notAvailableThroughPharmacies
+          description: |
+            When `type` is `active`, `details` will not be included.
+
+            Only `active` and `recalled` will be available for MVP.
         details:
           type: object
           required:
@@ -1620,7 +1804,6 @@ components:
           description: This attribute will not be included when type is `active`.
       example:
         type: active
-        details: null
     DrugsWrapper:
       type: object
       required:
@@ -2432,7 +2615,6 @@ components:
         url: https://bit.ly/2MUVNgT
         drugStatus:
           type: active
-          details:
         variants:
         - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
           urlSlug: lipitor
@@ -2480,7 +2662,6 @@ components:
         url: https://bit.ly/2MUVNgT
         drugStatus:
           type: active
-          details:
         variants:
         - id: 8275d9d5-cc08-4d1c-b37d-2855da4b6a4f
           urlSlug: lipitor
@@ -2543,6 +2724,21 @@ components:
                 coordinates:
                   latitude: 44.949782
                   longitude: -93.285233
+  securitySchemes:
+    clientOAuth:
+      type: oauth2
+      description: The endpoints for MVP will use OAuth client credentials for authentication.
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes: {}
+servers:
+  - url: 'https://{server}/v1'
+    variables:
+      server:
+        default: searchrx-mock.herokuapp.com
+        enum:
+          - searchrx-mock.herokuapp.com
 tags:
   - name: MVP
     description: These features are planned for MVP.
