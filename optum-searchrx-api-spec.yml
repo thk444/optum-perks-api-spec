@@ -412,7 +412,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drugs/{id-or-urlSlug}/images:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -493,7 +493,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -511,7 +511,7 @@ paths:
                 $ref: '#/components/schemas/HealthConditionsWrapper'
   /health-conditions/{id-or-urlSlug}:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -531,7 +531,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /health-conditions/{id-or-urlSlug}/drugs:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -1100,7 +1100,10 @@ components:
           - healthCondition
         default: drug
       required: false
-      description: Restricts results to include values of the specified type. If no value is specified, `drug` is used.
+      description: |
+        Restricts results to include values of the specified type. If no value is specified, `drug` is used.
+
+         **Note:** Only `drug`, the default, is supported for MVP.
   schemas:
     AppContent:
       type: object
@@ -1689,7 +1692,6 @@ components:
       type: object
       required:
         - description
-        - healthConditions
         - html
         - id
         - name
@@ -1719,7 +1721,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DrugClassHealthCondition'
-          description: Indicates which health conditions this class of drug is popularly prescribed for.
+          description: |
+            Indicates which health conditions this class of drug is popularly prescribed for.
+
+            **Note:** This attribute is Post-MVP and will not be included for MVP.
     DrugClassHealthCondition:
       type: object
       required:
@@ -2422,7 +2427,6 @@ components:
         - phoneNumber
         - state
         - tzDatabaseName
-        - websiteUrl
         - zipCode
       properties:
         id:
@@ -2460,10 +2464,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OperatingHours'
-        websiteUrl:
-          type: string
-          example: https://target.com
-          nullable: true
         phoneNumber:
           type: string
           example: (612) 111-1111
@@ -2720,7 +2720,6 @@ components:
                   close:
                     day: Sunday
                     time: '22:00'
-                websiteUrl: https://target.com
                 phoneNumber: "(612) 111-1111"
                 coordinates:
                   latitude: 44.949782
