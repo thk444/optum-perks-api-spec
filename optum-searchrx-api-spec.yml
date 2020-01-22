@@ -2244,7 +2244,6 @@ components:
         - phoneNumber
         - state
         - tzDatabaseName
-        - websiteUrl
         - zipCode
       properties:
         id:
@@ -2282,10 +2281,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OperatingHours'
-        websiteUrl:
-          type: string
-          example: https://target.com
-          nullable: true
         phoneNumber:
           type: string
           example: (612) 111-1111
@@ -2544,7 +2539,6 @@ components:
                   close:
                     day: Sunday
                     time: '22:00'
-                websiteUrl: https://target.com
                 phoneNumber: "(612) 111-1111"
                 coordinates:
                   latitude: 44.949782
