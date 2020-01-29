@@ -1532,10 +1532,10 @@ components:
           example: Atorvastatin
         descriptionHtml:
           type: string
-          example: <p>This medicine is an HMG-CoA <a href='https://example.com/drug-class/statin'>reductase inhibitor</a> (also known as a "statin") used in combination with...</p>
+          example: <p>This medicine is an HMG-CoA <a href='https://example.com/drug-class/statin'>reductase inhibitor</a> (also known as a statin) used in combination with...</p>
         descriptionText:
           type: string
-          example: This medicine is an HMG-CoA reductase inhibitor (also known as a "statin") used in combination with...
+          example: This medicine is an HMG-CoA reductase inhibitor (also known as a statin) used in combination with...
         drugType:
           $ref: '#/components/schemas/DrugType'
         drugStatus:
