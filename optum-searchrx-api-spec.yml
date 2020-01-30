@@ -1788,14 +1788,17 @@ components:
           type: string
           enum:
             - active
-            - notYetAvailable
             - recalled
+            - notYetAvailable
             - notAvailableThroughPharmacies
           description: |
-            When `type` is `active`, `details` will not be included.
+            **Note:** Only `active` and `recalled` will be available for MVP.
 
-            Only `active` and `recalled` will be available for MVP.
-        details:
+            * When `type` is `active`, no associated object will be included.
+            * When `type` is `recalled`, `recalled` will be included.
+            * When `type` is `notYetAvailable`, `notYetAvailable` will be included.
+            * When `type` is `notAvailableThroughPharmacies`, `notAvailableThroughPharmacies` will be included.
+        recalled:
           type: object
           required:
             - description
@@ -1804,15 +1807,64 @@ components:
           properties:
             title:
               type: string
-              example: Dexlansoprazole is not available yet.
+              example: Dexlansoprazole has been recalled.
             description:
               type: string
-              example: Dexlansoprazole has been approved by the FDA but isn't available in pharmacies yet.
+              example: Learn more about this drug recall.
             moreInfoUrl:
               type: string
               example: https://example.com/more-details
               nullable: true
-          description: This attribute will not be included when type is `active`.
+          description: |
+            [MVP] This associated object will be included when `type` is `recalled`.
+        notYetAvailable:
+          type: object
+          required:
+            - descriptionHtml
+            - moreInfoButtonLabel
+            - moreInfoUrl
+            - title
+          properties:
+            title:
+              type: string
+              example: This drug is not yet available.
+            descriptionHtml:
+              type: string
+              example: |
+                <p><strong>Nitisinone</strong> has been approved by the FDA but isn't available at pharmacies yet.</p>
+            moreInfoUrl:
+              type: string
+              example: https://example.com/more-details
+              nullable: true
+            moreInfoButtonLabel:
+              type: string
+              example: Learn More
+          description: |
+            [Post-MVP] This associated object will be included when `type` is `notYetAvailable`.
+        notAvailableThroughPharmacies:
+          type: object
+          required:
+            - descriptionHtml
+            - moreInfoButtonLabel
+            - moreInfoUrl
+            - title
+          properties:
+            title:
+              type: string
+              example: This prescription is provided by a doctor and is generally not available at a pharmacy.
+            descriptionHtml:
+              type: string
+              example: |
+                <p>This drug is administered by your healthcare practitioner (HCP) which usually means one or more of the following:</p>
+            moreInfoUrl:
+              type: string
+              example: https://example.com/more-details
+              nullable: true
+            moreInfoButtonLabel:
+              type: string
+              example: Learn More
+          description: |
+            [Post-MVP] This associated object will be included when `type` is `notAvailableThroughPharmacies`.
       example:
         type: active
     DrugType:
