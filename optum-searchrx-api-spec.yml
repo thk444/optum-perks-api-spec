@@ -1512,6 +1512,7 @@ components:
       required:
         - defaultSettings
         - drugStatus
+        - drugMessages
         - drugType
         - formulations
         - id
@@ -2078,7 +2079,7 @@ components:
     ImageWithDarkModeSupport:
       type: object
       required:
-        - darkImageUrl
+        - darkModeImageUrl
         - imageUrl
       properties:
         imageUrl:
@@ -2395,7 +2396,7 @@ components:
         - isFavorite
         - isMembershipRequired
         - location
-        - logoUrl
+        - logo
         - membershipDetailsUrl
         - name
       properties:
