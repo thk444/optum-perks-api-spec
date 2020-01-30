@@ -154,7 +154,9 @@ paths:
       security:
         - clientOAuth: []
       description: |
-        Returns details for the coupon with the specified ID for the specified account ID.
+        Returns details for the coupon with the specified ID.
+
+        **Note:** `X-Account-ID` is optional.
 
         When available, clients should specify their current location via the `location` query parameter.
       parameters:
