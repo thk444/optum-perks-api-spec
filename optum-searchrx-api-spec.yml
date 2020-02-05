@@ -437,7 +437,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drug-classes:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -454,7 +454,7 @@ paths:
                 $ref: '#/components/schemas/DrugClassesWrapper'
   /drug-classes/{id-or-urlSlug}:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -474,7 +474,7 @@ paths:
           $ref: '#/components/responses/Error404'
   /drug-classes/{id-or-urlSlug}/drugs:
     get:
-      tags: [MVP]
+      tags: [Post-MVP]
       security:
         - clientOAuth: []
       description: |
@@ -1236,33 +1236,24 @@ components:
         textBody:
           type: string
           example: >
-            Here's your coupon for Atorvastatin. Show this to your pharmacist:
-
-            MemberID: ABC1234567
-            RxGroup: ABC123
-            RxBin: 009999
-            RxPCN: ABCDEF
-            https://searchrx.com/123
+            Coupon for Atorvastatin. Show this to your pharmacist.
+            GRP: ABC1234
+            BIN: ABC1234
+            PCN: ABC1234
+            UID: ABC1234
+            http://perks.optum.com/coupon/6df5140c-f74e-4334-983e-8d4839fe8dd6
         emailBody:
           type: string
           example: >
-            <html>
-              <head>
-                <title>Here is your Atovastatin coupon</title>
-              </head>
-              <body>
-                <table>
-                  <tr>
-                    <td>
-                      Show this to your pharmacist at your local Walmart pharmacy.
-                    </td>
-                  </tr>
-                </table>
-              </body>
-            </html>
+            Coupon for Atorvastatin. Show this to your pharmacist.
+            GRP: ABC1234
+            BIN: ABC1234
+            PCN: ABC1234
+            UID: ABC1234
+            http://perks.optum.com/coupon/6df5140c-f74e-4334-983e-8d4839fe8dd6
         subjectLine:
           type: string
-          example: Here is your Atorvastatin Coupon
+          example: Here is your Atorvastatin coupon
         coupon:
           $ref: '#/components/schemas/Coupon'
     CouponCopyPost:
@@ -1522,6 +1513,7 @@ components:
         - legalDisclaimer
         - medicare
         - name
+        - pharmacologicClassifications
         - sideEffects
         - therapeuticClassifications
         - urlSlug
@@ -1650,6 +1642,12 @@ components:
             type: string
           example: [Antihyperlipidemic]
           description: A list of this drug's therapeutic classifications. If there are none, an empty array will be returned.
+        pharmacologicClassifications:
+            type: array
+            items:
+              type: string
+              example: [HMG-COA Reductase Inhibitor]
+              description: A list of this drug's pharmacologic classifications. If there are none, an empty array will be returned.
         urlSlug:
           type: string
           example: atorvastatin
@@ -1798,6 +1796,7 @@ components:
             * When `type` is `recalled`, `recalled` will be included.
             * When `type` is `notYetAvailable`, `notYetAvailable` will be included.
             * When `type` is `notAvailableThroughPharmacies`, `notAvailableThroughPharmacies` will be included.
+            * **Backwards Compatibility Note:** If an unrecognized `type` is received by the client, `active` should be assumed.
         recalled:
           type: object
           required:
@@ -1873,6 +1872,8 @@ components:
         - brand
         - generic
       example: generic
+      description: |
+        **Backwards Compatibility Note:** If an unrecognized `drugType` is received by the client, `brand` should be assumed.
     DrugsWrapper:
       type: object
       required:
@@ -2399,6 +2400,8 @@ components:
         - low
         - medium
         - high
+      description: |
+        **Backwards Compatibility Note:** If an unrecognized `priceLevel` is received by the client, `medium` should be assumed.
     PricesWrapper:
       type: object
       required:
