@@ -2046,59 +2046,6 @@ components:
             $ref: '#/components/schemas/HealthCondition'
         metadata:
           $ref: '#/components/schemas/PageMetadataNull'
-    Help:
-      allOf:
-        - $ref: '#/components/schemas/HelpBase'
-        - type: object
-          required:
-            - entries
-          properties:
-            entries:
-              type: array
-              items:
-                type: object
-                required:
-                  - descriptionHtml
-                  - descriptionPlainText
-                  - title
-                properties:
-                  title:
-                    type: string
-                    example: Do I need to register or pay for SearchRx?
-                  descriptionHtml:
-                    type: string
-                    example: >
-                      <p>No, you can use SearchRx completely free of charge.</p>
-                  descriptionPlainText:
-                    type: string
-                    example: No, you can use SearchRx completely free of charge.
-    HelpBase:
-      type: object
-      required:
-        - icon
-        - id
-        - title
-      properties:
-        id:
-          type: string
-          format: uuid
-        title:
-          type: string
-          example: How to Use
-        icon:
-          $ref: '#/components/schemas/ImageWithDarkModeSupport'
-    HelpWrapper:
-      type: object
-      required:
-        - data
-        - metadata
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/HelpBase'
-        metadata:
-          $ref: '#/components/schemas/PageMetadataNull'
     Image:
       type: object
       required:
