@@ -1372,7 +1372,7 @@ components:
         priceLevel:
           $ref: '#/components/schemas/PriceLevel'
         retailer:
-          $ref: '#/components/schemas/Retailer'
+          $ref: '#/components/schemas/RetailerWithLocation'
     CouponSendPost:
       type: object
       required:
@@ -1924,7 +1924,7 @@ components:
           type: string
           format: uuid
         retailer:
-          $ref: '#/components/schemas/Retailer'
+          $ref: '#/components/schemas/RetailerWithLocation'
     Formulation:
       type: object
       required:
@@ -2308,7 +2308,7 @@ components:
         quantity:
           $ref: '#/components/schemas/Quantity'
         retailer:
-          $ref: '#/components/schemas/Retailer'
+          $ref: '#/components/schemas/RetailerWithLocation'
         originalPrice:
           $ref: '#/components/schemas/PriceAmount'
         price:
@@ -2396,7 +2396,6 @@ components:
         - id
         - isFavorite
         - isMembershipRequired
-        - location
         - logo
         - membershipDetailsUrl
         - name
@@ -2419,8 +2418,15 @@ components:
           nullable: true
         logo:
           $ref: '#/components/schemas/ImageWithDarkModeSupport'
-        location:
-          $ref: '#/components/schemas/RetailerLocation'
+    RetailerWithLocation:
+      allOf:
+        - $ref: '#/components/schemas/Retailer'
+        - type: object
+          required:
+            - location
+          properties:
+            location:
+              $ref: '#/components/schemas/RetailerLocation'
     RetailersWrapper:
       type: object
       required:
