@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '0.39.0'
+  version: '0.40.0'
   title: SearchRx REST API
   description: |
     This API provides content for the SearchRx client apps, allows users to search for drugs, view drug info, and save, print, and share coupons.
@@ -1024,7 +1024,7 @@ components:
       name: locationIds
       schema:
         type: string
-      description: A comma-separated list of retailer location IDs. Either `searchLocation` or `locationIds` must be specified.
+      description: A comma-separated list of retailer location IDs.
       example: c824ef47-4200-467b-8f20-87de4332f45a,cc2cc436-7d3c-4aaf-859b-d71a92716eb1,3b9de4cb-129c-4625-b07f-1b5150d515e6
     page:
       in: query
@@ -1063,7 +1063,7 @@ components:
       name: searchLocation
       schema:
         type: string
-      description: The center of the search area. Format is `[latitude],[longitude]`. Either `searchLocation` or `locationIds` must be specified.
+      description: The center of the search area. Format is `[latitude],[longitude]`.
       example: 44.949782,-93.285233
     searchLocationLocation:
       in: query
@@ -2298,7 +2298,6 @@ components:
         - couponId
         - formulation
         - isLowestPrice
-        - originalPrice
         - price
         - priceLevel
         - quantity
@@ -2310,8 +2309,6 @@ components:
           $ref: '#/components/schemas/Quantity'
         retailer:
           $ref: '#/components/schemas/RetailerWithLocation'
-        originalPrice:
-          $ref: '#/components/schemas/PriceAmount'
         price:
           $ref: '#/components/schemas/PriceAmount'
         priceLevel:
